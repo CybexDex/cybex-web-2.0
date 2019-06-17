@@ -22,6 +22,12 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, checkout the [Nuxt.js docs](https://github.com/nuxt/nuxt.js).
+
+## About Fonts
+
+  Cybex use paid fonts `Avenir`, if you want to use it on your website, please buy the copyright or replace with other fonts in css.
+
+  Icons are free to reuse.
   
 ## Depends on
 - [cybexjs](https://github.com/CybexDex/cybexjs) 
@@ -49,11 +55,16 @@ For detailed explanation on how things work, checkout the [Nuxt.js docs](https:/
 ## FAQ
 
 - **How to change UI icons?**
+  
   Import file `client/assets/fonts/icons/icomoon.json` to [Icomoon](https://icomoon.io/app/#/select)
   Update following
+
   `client/assets/fonts/icons/*`
+
   `client/assets/style/_fonts/_icons.styl`
+
   `client/assets/style/_fonts/_icons_variables.styl`
 
 - **Why could not I see console.log?**
+  
   Check config option `log_ignore`, set to false
