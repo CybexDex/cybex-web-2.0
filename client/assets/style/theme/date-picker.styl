@@ -1,0 +1,56 @@
+ // 日历控件样式
+.cybex 
+  .theme--dark
+    .v-picker__body
+    .v-card
+      background-color: $main.anchor;
+    &.v-date-picker-table 
+      th
+        color: rgba($main.white, 0.3)
+        f-cybex-style('heavy');
+        font-size: 14px;
+  .v-picker--date {
+    .v-date-picker-table{
+      min-height: 250px;
+      &--date {
+        td {
+          height: 34px;
+          padding: 4px 0;
+        }
+      }
+    }
+    button {
+      color: rgba($main.white, 0.8);
+      .v-btn__content {
+        padding-top: 2px;
+        f-cybex-style('heavy');
+      }
+      &.v-btn--disabled {
+        background: transparent !important;
+      }
+      // 选中的时间
+      &.cybex-date-time {
+        background: $gradients.goldex;
+        color: $main.anchor;
+        // 未选中的时间
+        &--text {
+          border: 1px solid $main.grey;
+        }
+      }
+    }
+    .v-picker__actions {
+      .v-btn {
+        padding: 0 2px;
+        min-width: 60px;
+        &:hover {
+          color: $main.orange !important;
+          &:before {
+            background-color: transparent;
+          }
+        }
+        .v-btn__content {
+          text-transform: uppercase;
+        }
+      }
+    }
+  } 

@@ -1,0 +1,550 @@
+// mixin
+theme-placeholder($size) {
+  $sizeVar = lookup('$input-' + $size);
+
+  &.{$size}-size {
+    // placeholder
+    textarea::-ms-input-placeholder,
+    input:-ms-input-placeholder {
+      color: rgba($main.grey, 0.5);
+      font-size: $sizeVar.label-size;
+    }
+
+    textarea::placeholder,
+    input::placeholder {
+      color: rgba($main.grey, 0.5);
+      font-size: $sizeVar.label-size;
+    }
+
+    textarea::-webkit-input-placeholder,
+    input::-webkit-input-placeholder {
+      color: rgba($main.grey, 0.5);
+      font-size: $sizeVar.label-size;
+    }
+  }
+}
+
+// TODO: light theme调整颜色
+theme-solo($size, theme = 'cybex-dark') {
+  $sizeVar = lookup('$input-' + $size);
+
+  &.{$size}-size {
+    // fixed label
+    .fixed-label {
+      font-size: $sizeVar.label-size;
+      top: 'calc(-%s - 4px)' % $sizeVar.fixed-label-height;
+      height: $sizeVar.fixed-label-height;
+    }
+    .fixed-append-label {
+      font-size: 'calc(%s + 2px)' % $sizeVar.label-size;
+      top: 'calc(-%s - 6px)' % $sizeVar.fixed-label-height;
+      height: $sizeVar.fixed-label-height;
+    }
+
+    &.v-text-field--fixed-label {
+      margin: 'calc(%s + 4px) 0 0' % $sizeVar.fixed-label-height;
+    }
+
+    .v-input__slot {
+      padding: '0 %s' % $sizeVar.input-slot-padding;
+    }
+
+    // prepend icon
+    .v-input__prepend-inner {
+      padding: 0;
+
+      .v-input__icon--prepend-inner {
+        margin: $sizeVar.prepend-icon-margin;
+        width: $sizeVar.prepend-icon-size;
+        height: $sizeVar.prepend-icon-size;
+        min-width: $sizeVar.prepend-icon-size;
+      }
+
+      .v-icon {
+        font-size: $sizeVar.prepend-icon-size;
+      }
+    }
+
+    // append icon
+    .v-input__append-inner {
+      font-size: $sizeVar.append-icon-size;
+
+      // capcha
+      .captcha-field {
+        svg {
+          top: unit(($sizeVar.input-height - captcha-svg-height) / 2, px);
+          transform: 'scale(1.25, %s)' % ($sizeVar.input-height / captcha-svg-height);
+        }
+      }
+
+      .v-icon {
+        &.ic-cancel {
+          font-size: $sizeVar.append-cancel-size !important;
+        }
+      }
+    }
+
+    .v-messages, input {
+      font-size: $sizeVar.label-size;
+    }
+
+    .v-input__control {
+      min-height: unit($sizeVar.input-height, px);
+    }
+
+    &.v-text-field-is-multiple {
+      .v-input__slot {
+        min-height: unit($sizeVar.input-height, px);
+        height: 100%;
+        padding: 16px 7px 7px 16px;
+      }
+    }
+    .v-input__slot {
+      height: unit($sizeVar.input-height, px);
+    }
+
+    .v-messages {
+      min-height: $sizeVar.margin-bottom-height;
+      margin-top: 'calc(%s / 4)' % $sizeVar.margin-bottom-height;
+    }
+  }
+}
+// end mixin
+
+// TODO: 生成SVG支持尺寸后取消CSS拉伸
+captcha-svg-width := 100;
+captcha-svg-height := 34;
+
+$input-large := {
+  label-size: 14px,
+  fixed-label-height: 24px,
+  input-height: 56,
+  prepend-icon-size: 28px,
+  prepend-icon-margin: 0 16px 0 0,
+  input-slot-padding: 16px,
+  append-icon-size: 28px,
+  append-cancel-size: 22px,
+  margin-bottom-height: 32px
+};
+$input-middle := {
+  label-size: 12px,
+  fixed-label-height: 20px,
+  input-height: 40,
+  prepend-icon-size: 28px,
+  prepend-icon-margin: 0 12px 0 0,
+  input-slot-padding: 12px,
+  append-icon-size: 28px,
+  append-cancel-size: 22px,
+  margin-bottom-height: 28px
+};
+$input-small := {
+  label-size: 12px,
+  fixed-label-height: 20px,
+  input-height: 32,
+  prepend-icon-size: 20px,
+  prepend-icon-margin: 0 8px 0 0,
+  input-slot-padding: 8px,
+  append-icon-size: 20px,
+  append-cancel-size: 14px,
+  margin-bottom-height: 20px
+};
+$input-tiny := {
+  label-size: 12px,
+  fixed-label-height: 20px,
+  input-height: 24,
+  prepend-icon-size: 20px,
+  prepend-icon-margin: 0 8px 0 0,
+  input-slot-padding: 8px,
+  append-icon-size: 20px,
+  append-cancel-size: 14px,
+  margin-bottom-height: 20px
+};
+
+// autocomplete 
+.v-text-field.v-autocomplete {
+  > .v-input__control {
+    > .v-input__slot:before {
+      border-style: none;
+    }
+  }
+}
+// cybex theme start
+.v-text-field {
+  &.theme--cybex-dark {
+    // message
+    &.v-text-field--no-message {
+      .v-messages {
+        height: 0;
+        min-height: 0;
+      }
+
+      .v-text-field__details {
+        display: none;
+        height: 0;
+      }
+    }
+
+    &.v-text-field--enclosed {
+      .v-text-field__details {
+        padding-left: 0;
+        margin-bottom: 0;
+      }
+    }
+    
+
+    .v-messages__message {
+      line-height: 1.33;
+    }
+
+    // placeholder
+    for size in 'tiny' 'small' 'middle' 'large' {
+      theme-placeholder(size);
+    }
+
+    // solo
+    &.v-text-field--solo {
+      // 通用样式开始
+      position: relative;
+
+      // fixed label
+      .fixed-label {
+        color: rgba($main.white, 0.8);
+        f-cybex-style('heavy');
+        position: absolute;
+        left: 0;
+        line-height: 1;
+      }
+      .fixed-append-label {
+        color: $main.grey;
+        f-cybex-style('heavy');
+        position: absolute;
+        right: 0;
+        display: flex;
+        flex: 1 1 auto;
+        align-items: flex-start;
+      }
+
+      // label as placeholder
+      .v-label {
+        color: $main.grey;
+        opacity: 0.5;
+        line-height: 1.5;
+
+        .os-windows & {
+          line-height: 1;
+        }
+      }
+
+      // input 通过padding调整line height
+      input {
+        padding: 9px 0 7px;
+      }
+
+      // read only + action
+      // .v-icon[class^="ic-"],
+      &[class^='v-text-field--action-'], &[class*=' v-text-field--action-'] {
+        .v-input__slot {
+          padding-right: 0 !important;
+          // background-color: $main.lead;
+        }
+      }
+
+      // read only
+      &.v-input--is-readonly {
+        .v-input__slot {
+          background-color: rgba(255, 255, 255, 0.04) !important;
+        }
+      }
+
+      // common input/textarea
+      .v-input__slot {
+        margin-bottom: 0;
+        border-radius: 4px;
+        background-color: $main.anchor;
+        box-shadow: none !important;
+        color: white;
+        caret-color: white;
+
+        .v-text-field__slot {
+          height: 100%;
+
+          textarea {
+            line-height: 1.71;
+            padding: 7px 16px 4px 0;
+            width: 100%;
+            resize: none;
+            font-size: $input-large.label-size;
+          }
+        }
+      }
+
+      // focused, hover, has value
+      &.v-input--is-focused, &:not(.v-text-field--action-custom):hover, &.v-input--is-dirty {
+        .v-input__slot {
+          background-color: $main.independence;
+        }
+
+        .v-input__icon--prepend-inner {
+          opacity: 1 !important;
+        }
+      }
+
+      // error
+      &.error--text {
+        // prepend icon
+        .v-input__icon--prepend-inner {
+          opacity: 1;
+
+          .v-icon:before {
+            color: $main.error;
+          }
+        }
+
+        .v-messages {
+          color: $main.error !important;
+          transition: color none;
+        }
+      }
+
+      // prepend icon
+      .v-input__icon--prepend-inner {
+        padding-right: 0;
+        opacity: 0.5;
+      }
+
+      // action icon
+      .v-input__action-inner {
+        display: flex;
+        box-shadow: inset 1px 0 0 0 $main.anchor;
+        height: 100%;
+        align-items: center;
+        text-align: center;
+        justify-content: space-around;
+        cursor: pointer;
+        background-color: $main.independence; // 293246
+        f-cybex-style('heavy');
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        font-size: 12px;
+        margin-left: 4px;
+        color: $main.grey;
+
+        > * {
+          width: 41px;
+          // width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+
+          &.not-narrow {
+            width: 49px;
+          }
+        }
+
+        .v-icon {
+          font-size: 22px !important;
+        }
+
+        &:hover {
+          background-color: $main.independence;
+          color: $main.white80;
+
+          .v-icon:before {
+            color: $main.white80;
+          }
+        }
+      }
+
+      // .captcha-field
+      .v-input__append-inner {
+        // capcha
+        .captcha-field {
+          span {
+            overflow: hidden;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            height: 100%;
+            width: 125px;
+            display: inline-block;
+            right: 0;
+            top: 0;
+            position: absolute;
+          }
+
+          svg {
+            position: relative;
+            left: unit((125 - captcha-svg-width) / 2, px);
+          }
+        }
+      }
+
+      .v-icon {
+        &.ic-cancel {
+          opacity: 0.4;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      // 通用样式结束
+
+      // 差异样式开始
+      for size in 'tiny' 'small' 'middle' 'large' {
+        theme-solo(size);
+      }
+    }
+
+    // 登录样式
+    // use outline覆写
+    &.v-text-field--outline {
+      &:not(.v-input--is-focused):not(.v-input--has-state) {
+        .v-input__slot:hover {
+          border: none !important;
+        }
+      }
+
+      .v-input__control {
+        position: relative;
+        caret-color: white !important;
+
+        .v-input__slot {
+          border: none;
+          box-shadow: rgb(23, 29, 42) 0px -1px 0px 0px inset;
+          border-radius: 4px;
+          margin-bottom: 0px;
+          background: rgb(33, 41, 57) !important;
+          height: 72px;
+
+          .v-input__prepend-inner, .v-input__append-inner {
+            align-self: center;
+            margin: 0;
+            padding: 0;
+            opacity: 0.3;
+
+            .v-icon {
+              font-size: $input-large.prepend-icon-size;
+            }
+          }
+
+          // preprend
+          .v-input__icon--prepend-inner {
+            margin: 0 16px 0 4px;
+          }
+
+          // append
+          .v-input__append-inner {
+            margin: 0 4px 0 0;
+          }
+
+          // input
+          input {
+            font-size: 14px;
+            f-cybex-style('heavy');
+            padding: 9px 0 7px;
+          }
+        }
+      }
+
+      .v-text-field__details {
+        position: absolute;
+      }
+
+      &.error--text {
+        // error text
+        .v-text-field__details {
+          z-index: 5;
+          top: 52px;
+          left: 35px;
+          min-height: 32px;
+          min-width: 266px;
+
+          .v-messages {
+            background-color: $main.crimson;
+            border-radius: 4px;
+            padding: 4px 8px 2px;
+            margin-top: 8px;
+            border-top-left-radius: 0;
+
+            &:before {
+              content: '';
+              display: block;
+              position: absolute;
+              top: -6px;
+              left: -6px;
+              width: 0;
+              transform: skew(45deg);
+              border-style: solid;
+              border-width: 0 0px 12px 12px;
+              border-color: transparent transparent $main.crimson transparent;
+            }
+
+            .v-messages__message {
+              color: $main.white !important;
+              line-height: 1.5;
+            }
+          }
+        }
+
+        // error icon
+        .v-input__prepend-inner {
+          opacity: 1 !important;
+
+          .v-icon:before {
+            color: $main.crimson !important;
+          }
+        }
+      }
+
+      // label
+      .v-label {
+        font-size: 14px;
+        f-cybex-style('heavy');
+        color: rgba($main.grey, 0.5) !important;
+        top: 27px;
+        height: 24px;
+      }
+
+      // focused
+      &.v-input--is-focused, &.v-input--is-dirty {
+        .v-label {
+          transform: translateY(-15px) scale(0.85);
+        }
+
+        .v-input__prepend-inner, .v-input__append-inner {
+          opacity: 1 !important;
+        }
+      }
+    }
+  }
+}
+
+// textarea
+.v-text-field {
+  &.v-textarea {
+    &.theme--dark {
+      &.v-text-field--solo:not(.v-text-field--solo-flat) {
+        .v-input__slot {
+          box-shadow: none;
+        }
+      }
+          
+      .v-input__slot {
+        background-color: $main.anchor;
+        box-shadow: none;
+        padding: 0 20px 16px 0 !important;
+        margin-bottom: 0;
+
+        textarea {
+          margin: 0;
+          font-size: 12px;
+          padding: 16px;
+          color: white;
+          caret-color: white;
+        }
+      }
+    }
+  }
+}

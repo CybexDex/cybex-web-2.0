@@ -1,0 +1,65 @@
+account相关,相关函数,参数,实现简要描述,用户行为,错误可能,错误分类,处理人,error_all,zh,en
+注册,,,,是,,,,,,
+验证码获取,verify_code,,从水龙头拿验证码,,,,,,,
+,,,,,水龙头Error,S.faucet,杨煜 ok,S.faucet.verify_code,,
+,,,,,可能后续增加次数限制。,E.U.F E.U.B,jeff，杨煜，大为,UB.ip.verify_code,,
+注册,register,,向水龙头注册用户,用户名，密码，验证码,,,,,,
+,,,,,用户名，过长，过短，格式不对,"UF,UB",Jeff ok; yangyu pending,E.register.userXXX,"账户名过短
+账户名必须以小写字母开头
+账户名仅能包含小写字母、数字、横杠
+账户名需至少包含一个数字或横杠
+账户名不能包含连续的横杠
+账户必须以小写字母或数字结尾
+账户名过短/过长","Account name should be longer
+Account name should start with a lowercase letter
+Account name should only contain lowercase letters, dashes, or numbers
+Account name should contain at least one dash or a number
+Account name should not contain continuous dashes
+Account name should end with a lowercase letter or number
+account name should be longer/shorter"
+,,,,,用户名已经存在,UF UB,Jeff ;yangyu OK,UB.user_exist.register,用户名已存在,Account name is already taken.
+,,,,,密码不合规定,UF,Jeff ok,E.register.password,密码需包含大小写字母、数字、特殊字符，长度不少于12个字符,"Password must contain upper case, lower case, numbers and special characters"
+,,,,,验证码错误,UB,yangyu OK,UB.code.register,验证码错误,Incorrect verification code
+,,,,,注册次数频繁,UB,Yangyu ok,UB.ip.register,请求过于频繁，请稍后再试,"Request too frequently, please retry later"
+,,,,,水龙头Error,S,Yangyu ok,S.faucet.register,,
+,,,,,,,,,,
+登录/unlock,unlock,,去全节点找是否有这个账号并有对应的公钥,用户名，密码,,,,,,
+,,,,,用户名不存在,UB,yangyu ok,UB.fail.unlock,账户名或密码错误,Incorrect account name or password
+,,,,,密码错误,UB,yangyu ok,UB.fail.unlock,账户名或密码错误,Incorrect account name or password
+,,,,,全节点错误,S,yangyu ok,S.node.unlock,,
+锁定,lock,,在store中删除掉用户key,点击,不应该出错,,,,,
+,,,,,,,,,,
+充值,,,,是,,,,,,
+获取充值地址,get_deposit,,,"Asset,username",理论上用户如果能点进来，就不该出错，要么是配置错误，要么是服务错误。,,,,,
+,,,,,资产不支持,S,yangyu ok,S.nocoin.get_deposit,,
+,,,,,用户名不存在,S,yangyu ok,UB.nouser.get_deposit,,
+,,,,,网关error,S.gateway,Yangyu ok,S.gateway.get_deposit,,
+提现,,,,是,,,,,,
+获取提现信息,withdraw_info,,,coin,,,,,,
+,,,,,网关error,S.gateway,,S.gateway.withdraw_info,,
+,,,,,"coin不存在,配置问题",S.config,,S.config.withdraw_info,,
+提现,withdraw,,,"Coin,amount,address",,,,,,
+,,,,,余额不够,UF UB,"Xuzong,yangyu OK",UB.balance.withdraw,余额不足,Not enough balances
+,,,,,小于最小值,UF,Xuzong,UF.withdraw.min,小于最小提现额,Less than the minimum withdrawal amount
+,,,,,节点问题,S.node,Yangyu ok,S.node.withdraw,,
+,,,,,fee不够,UF UB,"Xuzong,yangyu ok",UB.fee.withdraw,手续费不足,not enough fee
+,,,,,没有转账权限,UB,Yangyu,UB.authority.transfer,暂无转账权限,No transfer permission
+,,,,,没法写memo,UB,Yangyu  ok,UB.memokey.transfer,暂无转账权限,No transfer permission
+,,,,,可能上链成功，网关失败吗？,,,,,
+,,,,,会不会配置问题导致发送给错误的人和带错误memo,,,,,
+交易,limit_order_create,,发起一笔挂单交易上链,"Market,side,price,amount",,,,,,
+,,,,,market不存在,UF，UB,"danxia,yangyu ok,只能判断资产",S.config.trade,未知交易市场,Unknown market
+,,,,,余额不够,U.F U.B,"danxia ok,yangyu ok",UB.balance.trade,余额不足,Not enough balances
+,,,,,挂单price精度，最大最小,UF,"Danxia ok,",UF.trade.price,不用提示用户，超出精度不允许输入,
+,,,,,挂单量最小限制,UF,danxia ok,,成交金额不小于10（不同币种数字不同）,Total must not less than 10.（不同币种数字不同）
+,,,,,结点错误,node,yangyu ok,S.node.trade,,
+,,,,,权限?,,,,,
+,,,,,fee不够,UF UB,"Danxia ok, yangyu ok",UB.fee.trade,手续费不足,not enough fee
+转账,transfer,,发起一笔转账上链,"转账到用户，amount，coin,memo",,,,,,
+,,,,,用户不存在,E.U.F E.U.B,,UB.nouser.transfer,,
+,,,,,余额不够,E.U.F E.U.B,,UB.balance.transfer,,
+,,,,,手续费不够,E.U.F E.U.B,,UB.fee.transfer,,
+cancel订单,cancel_order,,取消订单，发一笔取消订单上链,订单ID,,,,,,
+,,,,,ID不存在,UB,Yangyu OK,UB.noid.cancel_order,不提示,
+,,,,,手续费不够,UF UB,"Danxia,yangyu",UB.fee.cancel_order,手续费不足,not enough fee
+cancel all,,,,,,,,,,

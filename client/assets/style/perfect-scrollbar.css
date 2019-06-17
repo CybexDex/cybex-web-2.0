@@ -1,0 +1,180 @@
+/*
+ * Container style
+ */
+
+.ps {
+  overflow: hidden !important;
+  overflow-anchor: none;
+  -ms-overflow-style: none;
+  touch-action: auto;
+  -ms-touch-action: auto;
+  height: 100%;
+}
+
+/*
+ * Scrollbar rail styles
+ */
+
+.ps__rail-x {
+  display: none;
+  opacity: 0;
+  transition: background-color .2s linear, opacity .2s linear;
+  -webkit-transition: background-color .2s linear, opacity .2s linear;
+  height: 6px;
+  /* there must be 'bottom' or 'top' for ps__rail-x */
+  bottom: 0px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__rail-y {
+  display: none;
+  opacity: 0;
+  transition: background-color .2s linear, opacity .2s linear;
+  -webkit-transition: background-color .2s linear, opacity .2s linear;
+  width: 6px;
+  /* there must be 'right' or 'left' for ps__rail-y */
+  right: 0;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps--active-x>.ps__rail-x,
+.ps--active-y>.ps__rail-y {
+  display: block;
+  background-color: transparent;
+  z-index: 5;
+}
+
+.ps:hover>.ps__rail-x,
+.ps:hover>.ps__rail-y,
+.ps--focus>.ps__rail-x,
+.ps--focus>.ps__rail-y,
+.ps--scrolling-x>.ps__rail-x,
+.ps--scrolling-y>.ps__rail-y {
+  opacity: 1;
+  height: 10;
+}
+
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+  /* background-color: rgba(23, 29, 42, 0.5); */
+  opacity: 0.9;
+  /* height: 0; */
+}
+
+/*
+ * Scrollbar thumb styles
+ */
+
+.ps__thumb-x {
+  background-color: rgba(120, 129, 154, 0.1);
+  border-radius: 2px;
+  transition: background-color .2s linear, height .2s ease-in-out;
+  -webkit-transition: background-color .2s linear, height .2s ease-in-out;
+  height: 4px;
+  /* there must be 'bottom' for ps__thumb-x */
+  bottom: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps__thumb-y {
+  background-color: rgba(120, 129, 154, 0.1);
+  border-radius: 2px;
+  transition: background-color .2s linear, width .2s ease-in-out;
+  -webkit-transition: background-color .2s linear, width .2s ease-in-out;
+  width: 4px;
+  /* there must be 'right' for ps__thumb-y */
+  right: 2px;
+  /* please don't change 'position' */
+  position: absolute;
+}
+
+.ps-shown.ps--active-x .ps__thumb-x,
+.ps__rail-x:hover>.ps__thumb-x,
+.ps__rail-x:focus>.ps__thumb-x,
+.ps__rail-x.ps--clicking .ps__thumb-x {
+  background-color: rgba(120, 129, 154, 1);
+  height: 6px;
+}
+
+.ps__rail-y:hover>.ps__thumb-y,
+.ps__rail-y:focus>.ps__thumb-y,
+.ps__rail-y.ps--clicking .ps__thumb-y {
+  background-color: rgba(120, 129, 154, 1);
+  width: 6px;
+}
+
+/* always display scrollbar */
+
+.ps-shown.ps--active-x>.ps__rail-x,
+.ps-shown.ps--active-y>.ps__rail-y {
+  opacity: 0.5;
+}
+
+.ps-shown.ps .ps__rail-x:hover,
+.ps-shown.ps .ps__rail-y:hover,
+.ps-shown.ps .ps__rail-x:focus,
+.ps-shown.ps .ps__rail-y:focus,
+.ps-shown.ps .ps__rail-x.ps--clicking,
+.ps-shown.ps .ps__rail-y.ps--clicking {
+  opacity: 0.9;
+}
+
+.ps-shown.ps--active-x .ps__thumb-x {
+  background-color: rgba(120, 129, 154, 1);
+  width: 4px;
+}
+
+.ps-shown.ps--active-y .ps__thumb-y {
+  background-color: rgba(120, 129, 154, 1);
+  width: 4px;
+}
+
+/* MS supports */
+
+@supports (-ms-overflow-style:none) {
+  .ps {
+    overflow: auto !important;
+  }
+}
+
+@media screen and (-ms-high-contrast:active),
+(-ms-high-contrast:none) {
+  .ps {
+    overflow: auto !important;
+  }
+}
+
+.ps {
+  position: relative;
+}
+
+/* 针对cybex调整CSS */
+
+/* 导航栏需要增加flex属性 */
+
+.cybex-nav .ps {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+/* table需要设定高度 */
+
+.orders-area .ps {
+  height: 100%;
+}
+
+.orders-area .has_filter .ps {
+  height: calc(100% - 35px);
+}
+
+.orders-area.full-mode .has_filter .ps {
+  height: calc(100% - 48px);
+}

@@ -1,0 +1,39 @@
+// 生成对应字体样式
+@import "_font_variables"
+
+f-cybex-base(name, $os = 'mac')
+  $name = 'cybex-' + name;
+  $zh-name = "PingFangSC-Regular";
+  $weight = $fontWeight[name];
+  // windows不适用Avenir字体渲染
+  if $os == 'windows'
+    $weight = $fontWeight[name + '-' + $os];
+    
+  if $weight <= 400
+    $zh-name =  "PingFangSC-Light"; //, "Microsoft Yahei Light"
+  if $weight == 'bold'
+    $zh-name =  "PingFangSC-Medium"; //,  "Microsoft Yahei Bold"
+  if $weight == 'bolder'
+    $zh-name =  "PingFangSC-Semibold"; //, "Microsoft Yahei Bold"    
+
+  $f-family = $name, $zh-name, "Arail", "sans-serif" !important;
+  if $os == 'windows'
+    $f-family = $zh-name, "Arail", "sans-serif" !important;
+  font-family: $f-family;
+  font-weight: $weight;
+  -webkit-font-smoothing: antialiased;
+
+/**
+  * @param name 默认mac下字体样式
+  * @param adjustName windows下字体样式
+**/
+f-cybex-style(name, adjustName = '')
+  f-cybex-base(name);
+  .os-windows & 
+    if adjustName == ''
+      adjustName = name
+    f-cybex-base(adjustName, 'windows');
+
+  
+
+    

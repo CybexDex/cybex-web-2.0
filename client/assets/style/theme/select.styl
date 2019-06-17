@@ -1,0 +1,292 @@
+$select-small ?= {
+  min-height: 24px,
+  min-width: 90px,
+  max-width: 120px,
+  padding: 0 8px,
+  font-size: 12px,
+  icon-size: 16px,
+  text-indent: 21px
+};
+$select-middle ?= {
+  min-height: 32px,
+  min-width: 100px,
+  max-width: 100%,
+  padding: 0 8px,
+  font-size: 12px,
+  icon-size: 16px,
+  text-indent: 21px
+};
+$select-large ?= {
+  min-height: 48px,
+  min-width: 200px,
+  max-width: 100%,
+  padding: 0 8px 0 0,
+  font-size: 14px,
+  icon-size: 24px,
+  text-indent: 16px
+};
+
+theme-select(size) {
+  $sizeVar = lookup('$select-' + size);
+
+  &.{size}-size {
+    .v-input__control {
+      min-height: $sizeVar.min-height;
+    }
+
+    .v-input__slot {
+      min-width: $sizeVar.min-width;
+      max-width: $sizeVar.max-width;
+      padding: $sizeVar.padding;
+
+      .v-select__selections {
+        font-size: $sizeVar.font-size;
+        text-indent: $sizeVar.text-indent;
+      }
+    }
+
+    .v-input__append-inner {
+      width: 'calc(%s + 4px)' % $sizeVar.icon-size;
+
+      .v-input__icon, .v-input__icon--append {
+        width: $sizeVar.icon-size;
+        min-width: $sizeVar.icon-size;
+
+        .v-icon {
+          font-size: $sizeVar.icon-size;
+        }
+      }
+    }
+    .v-messages {
+      padding: 4px 8px 2px;
+      margin-top: 8px;
+      font-size: 12px;
+      min-height: 18px;
+      line-height: 1.5;
+    }
+
+    .v-input__icon--clear {
+      .v-icon {
+        font-size: $sizeVar.icon-size;
+      }
+    }
+    if (size == 'large') {
+      .v-select__selections {
+        letter-spacing: 0.3px;
+      }
+    }
+    if (size == 'middle') {
+      input {
+        text-indent: 0;
+        text-align: left;
+      }
+
+      input:-ms-input-placeholder {
+        color: rgba($main.grey, 0.5);
+      }
+
+      input::placeholder {
+        color: rgba($main.grey, 0.5);
+      }
+
+      input::-webkit-input-placeholder {
+        color: rgba($main.grey, 0.5);
+      }
+    }
+  }
+}
+
+// 通用l abel
+.select-label {
+  font-size: 14px;
+  line-height: 1.71;
+  f-cybex-style('heavy');
+  letter-spacing: 0.3px;
+  color: rgba($main.white, 0.8);
+  margin-bottom: 9px;
+}
+
+// 覆写solo
+.v-select {
+  &.v-text-field--solo {
+    &.theme--dark {
+      &:not(.v-text-field--solo-flat) {
+        .v-input__slot {
+          box-shadow: none;
+        }
+      }
+
+      // message
+      &.no-message {
+        .v-messages {
+          height: 0;
+          min-height: 0;
+        }
+
+        .v-text-field__details {
+          display: none;
+          height: 0;
+        }
+      }
+      // active
+      &.v-select--is-menu-active {
+        .v-input__slot {
+          background-color: $main.independence;
+
+          .v-select__selections {
+            color: rgba($main.lilac, 1);
+          }
+
+          input {
+            color: rgba($main.lilac, 1);
+            caret-color: white;
+            &[readonly="readonly"] {
+              caret-color: transparent;
+            }
+          }
+        }
+      }
+
+      .v-input__slot {
+        border-radius: 4px;
+        background-color: $main.anchor;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+
+        .v-select__selections {
+          color: rgba($main.lilac, 0.5);
+          text-align: center;
+          f-cybex-style('heavy');
+
+          .full-width {
+            width: 100%;
+          }
+        }
+
+        input {
+          color: rgba($main.lilac, 0.5);
+          f-cybex-style('heavy');
+          font-size: 12px;
+          text-align: center;
+          padding: 0;
+          text-indent: 21px;
+          &[readonly="readonly"] {
+            caret-color: transparent;
+          }
+        }
+
+        .v-input__icon--append {
+          &.ic-cancel {
+            opacity: 0.3;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+      }
+
+      for size in 'small' 'middle' 'large' {
+        theme-select(size);
+      }
+    }
+  }
+}
+
+/* 普通搜索下拉菜单 */
+.v-select-list {
+  &.v-card {
+    &.theme--dark {
+      border-radius: 4px;
+      box-shadow: 0 16px 32px -16px rgba(0, 0, 0, 0.24);
+
+      .v-list {
+        background: $main.anchor;
+      }
+
+      .v-list__tile {
+        height: 32px;
+        color: rgba($main.white, 0.8) !important;
+        align-items: center;
+        justify-content: space-around;
+
+        >* {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 32px;
+        }
+
+        &:hover {
+          color: white;
+          background: rgba($main.white, 0.04);
+        }
+
+        &--disabled {
+          color: rgba($main.white, 0.3) !important;
+        }
+
+        &--active {
+          color: rgba($main.white, 0.8) !important;
+          background: rgba(black, 0.1);
+        }
+
+        font-size: 12px;
+        f-cybex-style('heavy');
+
+        .v-list__tile__title {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+/* 带搜索的下拉菜单样式覆写 */
+.v-autocomplete__content {
+  .v-list {
+    &.theme--dark {
+      background: #212939;
+      color: white;
+    }
+  }
+
+  &.v-menu__content {
+    overflow-y: hidden;
+    border-radius: 4px;
+    box-shadow: 0 16px 32px -16px rgba(0, 0, 0, 0.24);
+    background-color: $main.anchor;
+
+    .v-card {
+      border-radius: 4px;
+    }
+
+    .v-list__tile {
+      height: 32px;
+      color: rgba($main.white, 0.8) !important;
+      align-items: center;
+      justify-content: space-around;
+
+      &:hover {
+        color: white;
+        background: rgba(black, 0.04);
+      }
+
+      &--disabled {
+        color: rgba($main.white, 0.3) !important;
+      }
+
+      &--active {
+        color: rgba($main.white, 0.8) !important;
+        background: rgba(black, 0.1);
+      }
+
+      font-size: 12px;
+      f-cybex-style('heavy');
+
+      .v-list__tile__title {
+        text-align: center;
+      }
+    }
+  }
+}

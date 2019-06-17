@@ -1,0 +1,144 @@
+html {
+  overflow-y: auto;
+}
+
+.application {
+  background-color: $main.dark !important;
+}
+
+.cybex {
+  f-cybex-style('medium');
+
+  // content
+  .v-content {
+    &.min-width {
+      min-width: 1280px;
+    }
+  }
+
+  // title
+  .main-title {
+    f-cybex-style('heavy');
+    font-size: 28px;
+    line-height: 1.71;
+    letter-spacing: 0.29px;
+  }
+
+  // sub title
+  .sub-title {
+    f-cybex-style('medium');
+    font-size: 14px;
+    color: rgba($main.white, 0.8);
+    line-height: 1.71;
+  }
+
+  .selection-title {
+    f-cybex-style('heavy');
+    font-size: 16px;
+    line-height: 20px;
+    padding: 20px 0 12px;
+  }
+
+  // icon size
+  .v-icon[class^='ic-'], .v-icon[class*=' ic-'] {
+    font-size: 24px;
+
+    &.small {
+      font-size: 16px;
+    }
+  }
+
+  .v-icon:not([class*=' ic-']) {
+    font-size: 1em;
+  }
+
+  .page {
+    @extend .fade-transition;
+  }
+
+  ul li {
+    list-style-type: none;
+  }
+
+  ol li {
+    list-style-type: decimal;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  .no-data {
+    text-align: center;
+    color: rgba($main.white, 0.8);
+    // background: $main.lead;
+    max-height: 100%;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  // tooltip
+  .v-tooltip__content.cybex-tips {
+    padding: 13px 20px;
+    background-color: rgba(17, 22, 33, 0.92);
+    border-radius: 4px;
+    color: rgba($main.white, 0.8);
+    line-height: 1.87;
+  }
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.hidden {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  display: none !important;
+  transition: all 0.2s !important;
+}
+
+.pos-relative {
+  position: relative;
+}
+
+.zh-fixed-num:not(.os-windows) {
+  margin-top: 3px;
+  line-height: 1.67;
+}
+
+.keep-inline {
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.margin-auto {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.asset-icon-bg {
+  width: 20px;
+  height: 20px;
+  object-fit: fill;
+  f-cybex-style('black');
+  color: black;
+  line-height: 1.9;
+  text-align: center;
+  margin-right: 8px;
+}

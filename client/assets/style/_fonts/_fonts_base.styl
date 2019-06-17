@@ -1,0 +1,23 @@
+// $f => 字体名称  $n => 字体文件件名
+
+@import "_font_variables"
+@import "_font_mixin"
+
+f-family(family, n, weight) 
+  font-family family
+  font-weight weight
+  font-style normal
+  font-display block
+  src url($u-f-path + n + '.woff') format('woff'),
+      url($u-f-path + n + '.otf')  format('opentype');
+
+// 自定义字体文件     
+for name, weight in $fontData
+  $f-name = 'cybex-' + name
+  @font-face
+    f-family($f-name, 'AvenirLTPro-' + name, weight)
+    
+// 自定义字体class
+for name, weight in $fontData
+  .f-cybex-{name}
+    f-cybex-style(name);

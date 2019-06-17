@@ -1,0 +1,37 @@
+
+.cybex
+  .v-snack
+    z-index: 99999 !important;
+    color: #6dbb49;
+    &.msg-error
+      color: #be4634;
+      .ic-cancel:before
+        color: #d7333d; 
+  .v-snack--top
+    top: 76px;
+  .small-size
+    .v-snack--top
+      top: 56px;
+  .v-snack__wrapper
+    border-radius: 4px;
+    box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 16px 24px 2px rgba(0, 0, 0, 0.14);
+    background-color: #212939;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    justify-content: space-around;
+    .v-snack__content
+      .content
+        padding: 0 63px;
+        display: flex;
+        align-items: center;
+        .icon
+          font-size: 24px;
+          padding: 12px;
+        .msg
+          font-size: 14px;
+          top: 2px;
+          position: relative;
+          f-cybex-style(heavy);
+

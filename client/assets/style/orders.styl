@@ -1,0 +1,349 @@
+@import '~assets/style/_fonts/_font_mixin';
+@require '~assets/style/_vars/_colors';
+@require '~assets/style/_vars/_vars';
+
+// 交易所页面高度不够时调整行间距
+.small-size {
+  .orders-area {
+    height: 'calc(100% - %s - %s - %s)' % (k-line-min-height k-line-toolbar-height small-activity-height);
+    width: 100%;
+  }
+}
+
+// fixed header
+.orders-area {
+  .fixed-header {
+    padding: 0 20px;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 32px;
+    align-items: center;
+    color: rgba($main.white, 0.5);
+    background: $main.lead;
+    line-height: 1.33;
+
+    &.has_filter {
+      top: order-filter-height;
+    }
+
+    .col-header {
+      padding: 9px 8px;
+    }
+  }
+}
+
+.orders-area {
+  &.full-mode {
+    .fixed-header {
+      height: 37px;
+      font-size: 12px;
+      padding-top: 10px;
+
+      &.has_filter {
+        top: order-filter-large-height;
+      }
+    }
+  }
+}
+
+// orders 单独页面
+.orders-area {
+  &.full-mode {
+    padding: 0 72px;
+    min-width: calc(1280px - 72px - 72px);
+    height: 100%;
+    max-height: 'calc(100vh - %s - %s - %s - %s - %s)' % (order-page-title-height order-page-title-mb order-page-pb nav-height footer-height);
+
+    &.order-list {
+      height: 'calc(100vh - %s - %s - %s - %s - %s - %s)' % (order-page-title-height order-page-title-mb order-page-pb nav-height footer-height order-asset-tab-height);
+    }
+
+    overflow-x: auto;
+    margin: 0 auto;
+
+    .filters {
+      height: order-filter-large-height;
+
+      .date {
+        flex: 0 1 auto;
+        margin-right: 32px;
+      }
+
+      .date-time {
+        .v-menu__activator--active {
+          .v-input--is-readonly {
+            .v-input__slot {
+              background-color: $main.independence;
+
+              input {
+                color: $main.white !important;
+              }
+            }
+          }
+        }
+
+        .v-input__control {
+          min-height: 24px !important;
+        }
+
+        .v-input__slot {
+          margin: 0 !important;
+          min-width: 99px;
+          max-width: 120px;
+          font-size: 12px;
+          background-color: $main.anchor;
+
+          input {
+            text-align: center;
+            color: $main.grey !important;
+          }
+        }
+      }
+
+      .filter-pairs {
+        flex: 0 1 265px !important;
+        margin-right: 32px;
+
+        > label {
+          flex: 0 1 auto !important;
+        }
+
+        > span {
+          flex: 0 1 14px !important;
+          text-align: center;
+        }
+
+        .pairs-items {
+          flex: 1 1 80px !important;
+          max-width: 95px;
+        }
+      }
+    }
+
+    >div {
+      height: inhreit;
+
+      .v-table__overflow {
+        min-height: 120px;
+        padding: 8px 20px 0;
+        overflow: auto;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.page-orders {
+  .v-list.theme--dark {
+    background: $main.anchor;
+    color: $main.white;
+  }
+}
+
+// exchange页面
+.orders-area {
+  height: 'calc(100% - %s - %s - %s)' % (k-line-min-height k-line-toolbar-height activity-height);
+  max-height: 40%;
+  overflow-y: hidden;
+  position: relative;
+
+  // cancel one button
+  .v-btn {
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 1.67;
+
+    &:hover:not(.v-btn--disabled) {
+      opacity: 1 !important;
+    }
+
+    &.cancel-one {
+      opacity: 0.5;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  // tabs
+  .theme--dark {
+    .v-tabs__container {
+      height: 'calc(%s - 16px)' % order-tab-height;
+      margin: 8px 0;
+      padding-bottom: 0px;
+    }
+  }
+
+  .filters {
+    height: order-filter-height;
+    display: flex;
+    align-items: center;
+    background: $main.lead;
+    border-radius: 4px;
+    border-bottom: 1px solid $main.dark;
+    padding: 0 8px 0 28px;
+    color: $main.grey;
+
+    .date {
+      justify-content: flex-start;
+
+      >* {
+        flex: 0 1 auto !important;
+      }
+    }
+
+    .d-flex {
+      align-items: center;
+    }
+
+    .v-btn--icon {
+      width: 24px;
+      height: 24px;
+      margin-left: 8px;
+    }
+
+    .date-time {
+      .v-menu__activator--active {
+        .v-input--is-readonly {
+          .v-input__slot {
+            background-color: $main.independence !important;
+          }
+        }
+      }
+
+      .v-input__control {
+        min-height: 24px !important;
+      }
+
+      .v-input--is-readonly {
+        .v-input__slot {
+          // margin: 0 8px 0 !important;
+          min-width: 99px;
+          max-width: 110px;
+          font-size: 12px;
+          background-color: $main.anchor !important;
+
+          input {
+            text-align: center;
+            color: rgba($main.white, 0.8);
+          }
+
+          f-cybex-style('heavy');
+        }
+      }
+    }
+  }
+
+  .orders-table-container {
+    background: $main.lead;
+    border-radius: 4px;
+    position: relative;
+    height: 100%;
+  }
+
+  .empty-table {
+    height: 100%;
+  }
+
+  .v-tabs {
+    height: 100%;
+
+    .v-tabs__bar {
+      &.theme--dark {
+        padding-left: 20px;
+      }
+    }
+
+    .v-window {
+      background: $main.dark;
+    }
+
+    .v-window, .v-tabs__items {
+      height: 'calc(100% - %s)' % order-tab-height;
+
+      .v-window-item, .v-window__container, .v-tabs__content {
+        height: 100%;
+        overflow-y: hidden;
+        background: $main.lead;
+        border-radius: 4px;
+
+        >div {
+          height: 100%;
+        }
+
+        .v-table__overflow {
+          overflow-y: auto;
+          height: 100%;
+          padding: 0 20px 0;
+
+          table {
+            table-layout: fixed;
+            max-width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .hide_pair {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0;
+    height: 24px;
+    margin: 10px 0 6px;
+  }
+
+  // 数据表格样式
+  table {
+    &.v-table {
+      &.theme--dark {
+        thead {
+          tr, th {
+            height: 32px;
+          }
+        }
+
+        tbody {
+          tr {
+            td {
+              padding: 6px 8px;
+              line-height: 1.87;
+              word-break: keep-all;
+            }
+
+            &.c-cancel-order {
+              td {
+                color: rgba(143, 154, 185, 0.5) !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .elevation-1 {
+    &.empty {
+      height: 100%;
+    }
+
+    &:not(.empty) {
+      table {
+        &.v-table {
+          &.theme--dark {
+            tbody {
+              tr:not(:last-child) {
+                td {
+                  border-bottom: 1px solid $main.dark !important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

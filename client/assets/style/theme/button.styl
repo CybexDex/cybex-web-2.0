@@ -1,0 +1,196 @@
+// size-settings
+$btn-tiny ?= {
+  height: 24px,
+  fontSize: 12px
+};
+$btn-small ?= {
+  height: 32px,
+  fontSize: 12px
+};
+$btn-normal ?= {
+  height: 40px,
+  fontSize: 14px
+};
+$btn-middle ?= {
+  height: 48px,
+  fontSize: 16px
+};
+$btn-large ?= {
+  height: 56px,
+  fontSize: 16px
+};
+// color settings
+$btn-major ?= {
+  bgImage: $gradients.goldex,
+  bgColor: $main.orange,
+  color: $main.white,
+  hoverColor: $main.white
+};
+$btn-minor ?= {
+  bgColor: $main.anchor,
+  color: $main.grey,
+  hoverColor: $main.white,
+  hoverBgColor: $main.independence
+};
+$btn-pre-minor ?= {
+  bgColor: $main.independence,
+  color: $main.grey,
+  hoverColor: $main.white,
+  hoverBgColor: $main.independence
+};
+$btn-minimal ?= {
+  bgColor: rgba($main.white, 0.1),
+  color: $main.white,
+  hoverColor: $main.white,
+  hoverBgColor: rgba($main.white, 0.3),
+  pressBgColor: rgba($main.white, 0.2)
+};
+$btn-icon-small ?= {
+  width: 24px,
+  height: 24px,
+}
+$btn-icon-normal ?= {
+  width: 32px,
+  height: 32px
+}
+// TODO: icon样式
+// $icon ?= {
+// bgImage: $gradients.anchor,
+// color: $main.grey,
+// hoverColor: $main.white
+// };
+// $iconClean ?= {
+// color: $main.grey,
+// hoverColor: $main.orange
+// }
+
+// mixin
+theme-btn(size, theme = 'cybex-dark') {
+  $sizeVar = lookup('$btn-' + size);
+
+  // size
+  &.{size}-size {
+    height: $sizeVar.height;
+    font-size: $sizeVar.fontSize;
+  }
+}
+
+theme-btn-icon(size, theme = 'cybex-dark') {
+  $sizeVar = lookup('$btn-icon-' + size);
+  &.{size}-size {
+    width: $sizeVar.width;
+    height: $sizeVar.height;
+  }
+}
+
+theme-btn-color(c) {
+  $colorVar = lookup('$btn-' + c);
+
+  &.{c}--text:not(.v-btn--icon):not(.v-btn--flat), 
+  &.{c}:not(.v-btn--icon):not(.v-btn--flat) {
+    if ($colorVar.bgColor) {
+      background-color: $colorVar.bgColor;
+    }
+
+    if ($colorVar.bgImage) {
+      background-image: $colorVar.bgImage;
+    }
+
+    color: $colorVar.color;
+
+    &:not(.v-btn--disabled):hover {
+      &:before {
+        background-color: $colorVar.bgColor;
+      }
+
+      if ($colorVar.hoverColor) {
+        color: $colorVar.hoverColor;
+      }
+
+      if ($colorVar.hoverBgColor) {
+        background-color: $colorVar.hoverBgColor;
+      }
+    }
+
+    &:active {
+      if ($colorVar.pressBgColor) {
+        background: $colorVar.pressBgColor;
+      }
+    }
+  }
+}
+
+// mixin end
+.v-btn {
+  &.theme--cybex-dark {
+    f-cybex-style('heavy');
+    text-transform: capitalize;
+    margin: 0;
+    padding: 0 16px;
+    border-radius: 4px;
+    width: auto;
+    transition: none !important;
+    box-shadow: none !important;
+
+    &.v-btn--block {
+      width: 100%;
+    }
+    &.v-btn--active:before, 
+    &.v-btn:hover:before, 
+    &.v-btn:focus:before {
+      background-color: transparent;
+    }
+    // disabled
+    &.v-btn--disabled {
+      pointer-events: visible;
+      cursor: not-allowed;
+      color: rgba($main.grey, 0.3) !important;
+
+      // overwrite vuetify theme
+      &:not(.v-btn--icon):not(.v-btn--flat):not(.v-btn--outline) {
+        background-color: rgba($main.grey, 0.3) !important;
+        background-image: none !important;
+      }
+    }
+
+    for s in 'tiny' 'small' 'normal' 'middle' 'large' {
+      theme-btn(s);
+    }
+    for color in 'major' 'pre-minor' 'minor' 'minimal' { 
+      theme-btn-color(color);
+    }
+
+    // icons
+    &.v-btn--icon {
+      background: $main.anchor;
+      border-radius: 4px;
+
+      .v-icon { 
+        &:before {
+          color: $main.grey;
+        }
+      }
+
+      &:hover {
+        background: $main.independence;
+        .v-icon {
+          &:before {
+            color: $main.white;
+          }
+        }
+      }
+
+      &.v-btn--disabled {
+        pointer-events: visible;
+        cursor: not-allowed;
+        .v-icon {
+          opacity: 0.3;
+        }
+      }
+
+      for size in 'small' 'normal' { 
+        theme-btn-icon(size);
+      }
+    }
+  }
+}

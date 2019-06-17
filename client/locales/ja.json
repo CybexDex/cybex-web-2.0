@@ -1,0 +1,115 @@
+{
+  "title": {
+    "name": "Cybex交易所",
+    "index": "首页",
+    "login": "登录",
+    "register": "注册",
+    "exchange": "{price} | {currencies} | 交易中心"
+  }, 
+  "nav": {
+    "login": "登录",
+    "register": "注册",
+    "exchange": "交易中心"
+  },
+  "exchange": {
+    "content": {
+      "latest-price": "最新价格",
+      "24h-change": "24h 变更",
+      "24h-high": "24h 最高",
+      "24h-low": "24h 最低",
+      "volume24h": "24h 成交量",
+      "groups": "深度合并",
+      "hide-pairs": "隐藏其他交易对"
+    },
+    "block-title": {
+      "markets": "市场",
+      "order-book": "Order Book",
+      "market-trades": "Market Trades",
+      "digits": "{digit} decimal",
+      "digitsmulti": "{digit} decimals"
+    },
+    "orderbook": {
+      "Price": "Price",
+      "Amount": "Amount",
+      "Total": "Total",
+      "digits": "{digit} decimal",
+      "digitsmulti": "{digit} decimals",
+      "Groups": "Groups"
+    },
+    "order-table": {
+      "no-open-data": "暂无委托。",
+      "no-close-data": "暂无委托。",
+      "no-trade-data": "暂无委托。",
+      "tab-title": {
+        "open-order": "当前委托",
+        "history-order": "历史委托",
+        "history-trade": "历史成交"
+      },
+      "column": {
+        "date": "委托时间",
+        "pair": "市场",
+        "type": "类型",
+        "side": "方向",
+        "price": "价格",
+        "amount": "金额",
+        "filled": "成交量",
+        "fillamount": "成交数量",
+        "total": "金额",
+        "cancel": "取消",
+        "status": "Status",
+        "average": "Average",
+        "time": "Time",
+        "fee": "Fee"
+      },
+      "filter": {
+        "hide": "Hide other pairs",
+        "1-day": "1 Day",
+        "1-week": "1 Week",
+        "1-month": "1 Month",
+        "3-months": "3 Months",
+        "from": "起止日期",
+        "time": "起止日期",
+        "all": "Show All"
+      }
+    },
+    "dialog": {
+      "confirm-order": "Confirm {action} {currency}",
+      "confirm-cancel": "Confirm Order Cancellation",
+      "confirm-cancel-all": "Confirm All Orders Cancellation",
+      "Cancel": "取消",
+      "OK": "确认"
+    },
+    "order-form": {
+      "title": {
+        "buy": "买入",
+        "sell": "卖出"
+      },
+      "label": {
+        "price": "Price",
+        "amount": "Amount",
+        "total": "Total",
+        "fee": "Fee"
+      },
+      "column": {
+        "price": "价格",
+        "amount": "金额",
+        "fee": "手续费",
+        "total": "成交金额"
+      },
+      "valid": {
+        "price": "Price must be greater than {value}",
+        "amount": "Amount must be greater than {value}",
+        "total": "Total must be greater than {value}"
+      },
+      "button": {
+        "login": "登录赛贝",
+        "or": "或",
+        "register": "立即注册",
+        "to-trade": "进行交易"
+      }
+    }
+  },
+  "errorMessage": {
+    "404": "无法找到当前页面"
+  }
+}

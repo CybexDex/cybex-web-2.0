@@ -1,0 +1,46 @@
+.cybex {
+  .theme--dark {
+    &.v-chip {
+      margin: 0;
+      margin-left: 16px;
+      min-width: 64px;
+      align-items: center;
+      justify-content: space-around;
+      font-size: 14px;
+
+      &:focus:not(.v-chip--disabled), 
+      &.v-chip--active, 
+      &.v-chip--selected {
+        box-shadow: none;
+        &:after {
+          background-color: $main.anchor;
+        }
+      }
+
+      &:hover:not(.v-chip--disabled),
+      &.v-chip--active, 
+      &.v-chip--selected {
+        .v-chip__content {
+          color: $main.orange !important;
+        }
+      }
+      
+      &.select_coin {
+        background: #212939 !important;
+        .v-chip__content {
+        font-size: 14px;
+        f-cybex-style('heavy');
+        line-height: 1.14;
+        text-align: center;
+        color: $main.grey;
+        cursor: pointer;
+
+          &:after {
+            background: #212939 !important;
+          }
+        }
+      }
+      
+    }
+  }
+}

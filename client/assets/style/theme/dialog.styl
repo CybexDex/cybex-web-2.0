@@ -1,0 +1,48 @@
+
+@require '~assets/style/_vars/_colors'
+@require '~assets/style/_fonts/_font_mixin'
+.cybex
+  .v-dialog
+    border-radius: 4px;
+    box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.2), 
+                0 6px 30px 5px rgba(0, 0, 0, 0.12), 
+                0 16px 24px 2px rgba(0, 0, 0, 0.14);
+    background-color: $main.anchor;
+    position: relative;
+    padding: 32px;
+
+    .btn-close {
+      position: absolute;
+      top: 12px
+      right: 12px;
+      color: $main.grey;
+    }
+    .v-card.theme--dark
+      background-color: $main.anchor;
+      box-shadow: none;
+      .v-card__title.headline
+        padding: 0;
+        font-size: 18px !important;
+        margin-bottom: 24px
+        line-height: 1.33
+        color: $main.white;
+        f-cybex-style('heavy');
+      .v-card__text
+        padding: 0;
+        font-size: 12px !important;
+        .line
+          line-height: 22px;
+          color: rgba($main.white, 0.8);
+          f-cybex-style('heavy');
+          .label
+            color: rgba($main.white, 0.3);
+            min-width: 40px;
+            f-cybex-style('medium');
+            
+      .v-card__actions
+        padding: 0
+        font-size: 12px !important;
+        .actions.m-l {
+          margin-right: 18px;
+        }
+      

@@ -1,0 +1,49 @@
+@require '~assets/style/_fonts/_font_mixin'
+@require '~assets/style/_vars/_colors'
+.cybex 
+  &.theme--dark
+  // exchange form
+  // 自定义input控件样式        
+  .exchange-form-input-wrapper        
+    .exchange-form-input:-ms-input-placeholder
+      color: #78819a;  
+      opacity: 0.5;
+    .exchange-form-input::placeholder
+      color: #78819a; 
+      opacity: 0.5; 
+    .exchange-form-input::-webkit-input-placeholder
+      color: #78819a;
+      opacity: 0.5; 
+    .exchange-form-input 
+      &.has-error {
+        border: 1px solid cybex-crimson;
+      }
+    .exchange-form-input-error {
+      min-height: 32px;
+      background: cybex-crimson;
+      padding: 0;
+      position: absolute;
+      top: 35px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding:0 10px;
+      border-radius: 0 4px 4px 4px;
+      z-index: 5;
+      &:before {
+        content: ""
+        display: block;
+        position: absolute;
+        top: -6px;
+        left: -3px;
+        width: 0;
+        transform: skew(35deg);
+        border-style: solid;
+        border-width: 0 0px 9px 6px;
+        border-color: transparent transparent cybex-crimson transparent; 
+      }
+    }
+
+
+.v-carousel
+  height: 100% !important;

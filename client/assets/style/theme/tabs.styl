@@ -1,0 +1,34 @@
+// class override
+@require '~assets/style/_fonts/_font_mixin'
+.cybex
+  &.theme--dark
+    .v-tabs
+      &__div 
+        margin 0 12px 0 8px
+        font-size: 12px;
+      &__item
+        padding 6px 2px
+        &:not(.v-tabs__item--active)
+          opacity: 1
+      &__bar 
+        background-color: dark;
+        .v_tabs__div
+          text-transform: none !important;
+          color #78819a;
+        .v-tabs__item--active
+          color: #ff9143;
+      &__container
+        height: 24px;
+        margin: 8px 0;
+        align-items: center;
+      &__slider 
+        &.cybex
+          background-color: #ff9143 !important;
+          border-color: #ff9143 !important;
+    .theme--dark
+      &.v-tabs__bar
+        .v-tabs__div
+          color: #78819a
+          text-transform: none !important;
+          f-cybex-style(heavy)
+      
