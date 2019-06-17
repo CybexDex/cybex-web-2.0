@@ -41,7 +41,7 @@ export default {
     dns: "https://5c8d458e27214a1ebb01faf6e9b2d567@sentry.nbltrust.com/10"
   },
   top_asset: ["CYB", "BTC", "ETH", "USDT"],
-  log_ignore: false,
+  log_ignore: true,
   extra_log: false,
   links: {
     "about": {
