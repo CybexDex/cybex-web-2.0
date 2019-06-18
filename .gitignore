@@ -11,4 +11,4 @@ npm-debug.log
 .nuxt/dist
 config.local.js
 
-dist
+/dist
