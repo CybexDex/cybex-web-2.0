@@ -1,9 +1,3 @@
-<!-- 交易对或者单个币种显示模块 -->
-<!-- 官方发行的币需要与用户自定义币区分显示 -->
-<!-- 币名通常过滤JADE.或者TEST. 交易大赛的前缀可根据参数shortenGame决定是否过滤
- e.g  <asset-pairs :asset-id="1.3.4" /> 显示为单币种
- e.g  <asset-pairs :base-id="1.3.4" :quote-id="1.3.8" /> 显示为 quotename/basename
- -->
 <template>
   <span class="asset-pair-wrapper" :style="styleObject" :title="title">
     <!-- 如果只有单个id或者名字 -->
@@ -111,7 +105,7 @@ export default {
       whitelist: "user/whitelist",
       coins: "user/coins",
       game_prefix: "exchange/game_prefix",
-      prefix: "exchange/prefix",
+      prefix: "exchange/prefix"
     }),
     styleObject() {
       let obj = {};
@@ -152,6 +146,7 @@ export default {
       return this.isInCustomAsset(this.baseName);
     }
   },
+
   methods: {
     ...mapActions({
       loadCoin: "user/load_coinmap"

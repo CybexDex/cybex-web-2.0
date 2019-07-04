@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
+// import zhLocale from '~/locales/zh-cn.json'
+// import enLocale from '~/locales/en.json'
+// import jaLocale from '~/locales/ja.json'
 import moment from 'moment'
 
 Vue.use(VueI18n)
@@ -9,7 +12,7 @@ const msgs = {
   'zh-cn': require('~/locales/zh-cn.json'),
   'ja': require('~/locales/ja.json')
 };
-export default ({ app, store }) => {
+export default ({ app, store, redirect, router, route }) => {
   // Set i18n instance on app
   // This way we can use it in middleware and pages asyncData/fetch
   app.i18n = new VueI18n({

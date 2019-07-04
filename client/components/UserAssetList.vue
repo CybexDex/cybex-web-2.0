@@ -104,11 +104,11 @@ export default {
     }),
     itemDatas() {
       const filteredList = filter(this.userAssets, item => {
-        const coinname = this.coinMap[item.asset_type];
+        const coinname = this.coinMap[item.asset_type] || ''
         let filtered =
           !this.querystr || coinname.indexOf(this.querystr.toUpperCase()) > -1;
         filtered = filtered && item.amount > 0;
-        filtered = filtered && !coinname.startsWith("JADE.");
+        filtered = filtered && !coinname.startsWith("JADE.")
         return filtered;
       });
       return filteredList;
@@ -166,7 +166,6 @@ export default {
   },
   async mounted() {
     setTimeout(this.setupUserAssets, 450);
-    // setTimeout(this.drawCustomizedIcon, 600)
   }
 };
 </script>

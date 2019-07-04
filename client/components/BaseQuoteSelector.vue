@@ -1,4 +1,3 @@
-<!-- 官方交易对选择下拉菜单 -->
 <template>
   <v-flex class="filter-pairs c-white-30" d-flex row align-center>
     <label class="c-white-30 mr-2">{{ $t(label) }}:</label>

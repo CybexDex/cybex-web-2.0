@@ -8,7 +8,7 @@
       <div>
         <v-content class="pb-5 min-width">
           <v-container fluid class="pa-0">
-            <nuxt v-if="inited"/>
+            <nuxt />
           </v-container>
         </v-content>
       </div>
@@ -28,32 +28,7 @@ export default {
     appNav: () => import("~/components/AppNavigation.vue"),
     appFooter: () => import("~/components/AppFooter.vue")
   },
-  computed: {
-    ...mapGetters({
-      username: "auth/username",
-      inited: "user/inited"
-    })
-  },
-  methods: {
-    ...mapActions({
-      loadAssets: "user/loadAssets",
-      updateCoinMap: "user/updateCoinMap"
-    })
-  },
-  watch: {
-    async username(val) {
-      if (!val) {
-        return;
-      }
-      await this.loadAssets(this.username);
-      await this.updateCoinMap();
-    }
-  },
-  async mounted() {
-    // await this.initBasics()
-    await this.loadAssets(this.username);
-    await this.updateCoinMap();
-  }
+  middleware: [ 'init-asset' ]
 };
 </script>
 

@@ -18,7 +18,7 @@ export class UserService {
   currentUser; // 当前激活用户名
   users; // 用户列表 Array< {id: String, name: String, full: Boolean}
   _keys; // 判定是否解锁用的关键字
-  // keyExpiredTimer; // 定时器 检查上锁与否
+  keyExpiredTimer; // 定时器 检查上锁与否
   assets = []; // TODO 所拥有资产
   mode; // 登录模式，默认云钱包
   wallet; // 钱包格式

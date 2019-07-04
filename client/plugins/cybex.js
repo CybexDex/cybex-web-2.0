@@ -3,6 +3,9 @@ import { setStore, g } from '../lib/cybex_help'
 import { indexOf } from 'lodash';
 import pair from "~/lib/pair_config.js";
 
+
+let navMenus = require('~/lib/navmenu.json');
+
 /**
  * 分析错误具体构成
  * @param {String} message ex2dev.UB.code.register  
@@ -88,17 +91,35 @@ export async function handleError(error, app, funcName, route, inSilence) {
 
 export default async ({ store, app, route }) => {
   setStore(store);
-  // init pairs
-  try {
-    const pairs = await g.app_pairs();
-    store.commit('user/SET_PAIRS', pairs);
-  } catch (e) {
-    console.error('failed to load pair config from server', e);
+  const setDefaultPairs = () => {
+    console.error('failed to load pair config from server, use default');
     store.commit('user/SET_PAIRS', pair);
   }
-  // setup global lib 
+  const setDefaultNavMenus = () => {
+    console.error('failed to load nav menu config from server, use default');
+    store.commit('SET_NAV_MENUS', navMenus);
+  }
+  // init pairs, menu settings
+  try {
+    await Promise.all([
+      g.app_pairs(),
+      g.appserver_json('navmenu.json')
+    ]).then(([pairs, menus]) => {
+      if (pairs) {
+        store.commit('user/SET_PAIRS', pairs);
+      } else {
+        setDefaultPairs();
+      }
+      if (menus) {
+        store.commit('SET_NAV_MENUS', menus);
+      } else {
+        setDefaultNavMenus();
+      }
+    })
+  } catch (e) {
+   
+  }
   Vue.prototype.cybexjs = g;
-  
   Vue.prototype.$callmsg = async function (...args) {
     let returnVal = null
     const callback = args.shift()

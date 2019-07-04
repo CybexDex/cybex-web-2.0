@@ -56,10 +56,10 @@
                 </td>
                 <td
                   class="text-xs-right"
-                >{{ props.item.balance | floorDigits(props.item.asset_type == '1.3.0' ? 5 : 6) }}</td>
+                >{{ props.item.balance | floorDigits(props.item.precision || 6) }}</td>
                 <td
                   class="text-xs-right"
-                >{{ (props.item.frozenBalance || 0) | floorDigits(props.item.asset_type == '1.3.0' ? 5 : 6) }}</td>
+                >{{ (props.item.frozenBalance || 0) | floorDigits(props.item.precision || 6) }}</td>
                 <td class="text-xs-right pr-1">
                   <template v-if="!coinMap[props.item.asset_type].startsWith(game_prefix)">
                     <div>{{ props.item.legalValue > 0 ? props.item.cybValue : 0 | floorDigits(5, -1) }}</div>
@@ -74,13 +74,13 @@
                   <div class="op-wrap">
                     <template v-if="props.item.asset_type !== '1.3.0'">
                       <a
-                        v-if="props.item.canDeposit"
+                        v-if="props.item.depositSwitch"
                         class="op-item border"
                         @click="jumpTo(`/fund/deposit/${coinMap[props.item.asset_type]}`)"
                       >{{ $t('button.deposit') }}</a>
                       <template v-else>
                         <v-tooltip
-                          :class="{'unopen': !props.item.canDeposit, 'border': true}"
+                          :class="{'unopen': !props.item.depositSwitch, 'border': true}"
                           v-if="(props.item.whyNotDeposit || {})[`${localeShort}Msg`]"
                           content-class="why-forbid-tip"
                           top
@@ -91,13 +91,13 @@
                         <span v-else class="op-item unopen border">{{ $t('button.pause') }}</span>
                       </template>
                       <a
-                        v-if="props.item.canWithdraw"
+                        v-if="props.item.withdrawSwitch"
                         class="op-item border"
                         @click="jumpTo(`/fund/withdraw/${coinMap[props.item.asset_type]}`)"
                       >{{ $t('button.withdraw') }}</a>
                       <template v-else>
                         <v-tooltip
-                          :class="{'unopen': !props.item.canDeposit, 'border': true}"
+                          :class="{'unopen': !props.item.depositSwitch, 'border': true}"
                           v-if="(props.item.whyNotWithdraw || {})[`${localeShort}Msg`]"
                           content-class="why-forbid-tip"
                           top
@@ -150,7 +150,7 @@
 <script>
 import utils from "~/components/mixins/utils";
 import { mapGetters, mapActions } from "vuex";
-import { filter, find, orderBy, pickBy, keys, map, cloneDeep } from "lodash";
+import { filter, find, orderBy, pickBy, keys, map, cloneDeep, assign, get } from "lodash";
 import config from "~/lib/config/config.js";
 
 let self = this;
@@ -163,7 +163,6 @@ export default {
     return {
       hideSmall: false,
       querystr: "",
-      topAssets: [],
       assets: null,
       tbItems: [
         {
@@ -219,11 +218,10 @@ export default {
   },
   mixins: [utils],
   async mounted() {
-    await this.loadAssets(this.username);
-    this.topAssets = await this.$call(this.cybexjs.top_asset);
+    await this.loadAssets(this.username)
     try {
       await this.setupAssetList();
-    } catch (e) {}
+    } catch (e) { console.log(e) }
   },
   computed: {
     ...mapGetters({
@@ -236,7 +234,9 @@ export default {
       localeShort: "i18n/shortcut",
       symbol: "i18n/symbol",
       assetList: "user/assets",
-      game_prefix: "exchange/game_prefix"
+      game_prefix: "exchange/game_prefix",
+      topAssets: "user/topAssets",
+      assetConfig: "user/assetConfigById"
     }),
     iconMap() {
       return this.icons || [];
@@ -274,29 +274,22 @@ export default {
     }
   },
   watch: {
-    async username(val) {
-      if (!val) {
-        return;
-      }
-      await this.loadAssets(this.username);
-      this.topAssets = await this.$call(this.cybexjs.top_asset);
+    async assetList() {
       try {
         await this.setupAssetList();
-      } catch (e) {}
+      } catch (e) { console.log(e) }
     }
   },
   methods: {
     ...mapActions({
       setTotal: "user/setTotal",
-      loadAssets: "user/loadAssets"
+      loadAssets: 'user/loadAssets'
     }),
     onSortClick(data) {
       const header = data.header;
       const sort = this.sortMap[header.value] === "desc" ? "asc" : "desc";
       const idx = this.tbItems.findIndex(i => i.value === header.value);
       this.sortBase = header.value;
-      // console.log('~~~~~ onSort: ', idx)
-      // this.$set(this.tbItems, idx, cloneDeep(header.curSort))
       this.sortMap[header.value] = sort;
       this.assets = orderBy(
         this.assets,
@@ -306,108 +299,75 @@ export default {
     },
     onExchangeClicked() {},
     async setupAssetList() {
-      let a = cloneDeep(this.assetList);
-
-      const [depo, withdr, _] = await Promise.all([
-        this.$callmsg(this.cybexjs.deposit_list),
-        this.$callmsg(this.cybexjs.withdraw_list),
-        this.$callmsg(this.cybexjs.load_base_market)
-      ]);
-      // const withdr = await g.withdraw_list()
-      let totalCyb = 0,
-        totalLegal = 0;
-
-      let legalId;
-      if (this.locale === "zh") legalId = null;
-      else legalId = this.prefix + "USDT";
-
-      // console.log('==== total item: ', a.length)
-      for (var i = 0; i < a.length; i++) {
-        const withdrawItem = withdr.find(e => {
-          return e.id === a[i].asset_type;
-        });
-        // if (a[i].balance != 0 && withdrawItem && withdrawItem.enable)
-        if (withdrawItem && withdrawItem.enable) a[i].canWithdraw = true;
-        else {
-          a[i].canWithdraw = false;
-          a[i].whyNotWithdraw = withdrawItem;
+      const list = await Promise.all(this.assetList.map(async (asset) => {
+        const data = {}
+        const cfg = this.assetConfig[asset.asset_type] || {}
+        asset.withdrawSwitch = cfg.withdrawSwitch
+        if (!asset.withdrawSwitch) {
+          data.whyNotWithdraw = get(cfg, `info.withdraw.${this.localeShort}Msg`)
         }
-
-        const depositItem = depo.find(e => {
-          return e.id === a[i].asset_type;
-        });
-        if (depositItem && depositItem.enable) a[i].canDeposit = true;
-        else {
-          a[i].canDeposit = false;
-          a[i].whyNotDeposit = depositItem;
+        asset.depositSwitch = cfg.depositSwitch
+        if (!asset.depositSwitch) {
+          data.whyNotDeposit = get(cfg, `info.deposit.${this.localeShort}Msg`)
         }
-
         // balance
-        if (a[i].balance != 0) {
+        if (asset.balance != 0) {
           const val = await this.$callmsg(
             this.cybexjs.assetAmount,
-            a[i].asset_type,
-            a[i].balance
+            asset.asset_type,
+            asset.balance
           );
           let v = parseFloat(val);
-          a[i].balance = v;
+          data.balance = v;
         } else {
-          a[i].balance = 0;
+          data.balance = 0;
         }
+        const info = await this.$call(this.cybexjs.queryAsset, asset.asset_type);
+        data.precision = info.precision;
+        //置顶
+        data.isTop = this.topAssets.indexOf(asset.asset_type) > -1 ? 1 : 0
+        return assign(cloneDeep(asset), data)
+      }))
 
-        a[i].name = this.coinName(a[i].asset_type, this.coinMap);
-        a[i].isTop = this.topAssets.indexOf(a[i].asset_type) > -1 ? 1 : 0;
-        // } else {
-        //   a[i].cybValue = 0
-        //   a[i].legalValue = 0
-        // }
-      }
+      this.assets = orderBy(list, ["isTop", "balance"], ["desc", "desc"]);
 
-      this.assets = orderBy(a, ["isTop", "balance"], ["desc", "desc"]);
-
+      let totalCyb = 0
+      let totalLegal = 0
+      let legalId = this.locale === "zh" ? null : this.prefix + "USDT"
       const values = [];
       await Promise.all(
-        map(a, async (item, i) => {
+        map(list, async (item, i) => {
           const frozen = await this.$callmsg(
             this.cybexjs.frozenBalances,
             this.username,
-            a[i].asset_type
+            item.asset_type
           );
           if (frozen && frozen != 0) {
             const val = await this.$callmsg(
               this.cybexjs.assetAmount,
-              a[i].asset_type,
+              item.asset_type,
               frozen.balance
             );
             let v = parseFloat(val);
-            a[i].frozenBalance = v;
+            item.frozenBalance = v;
           } else {
-            a[i].frozenBalance = 0;
+            item.frozenBalance = 0;
           }
 
-          a[i].totalBalance = a[i].frozenBalance + a[i].balance;
-
-          // console.log(a[i].totalBalance, a[i].frozenBalance, a[i].balance)
-
-          // if (a[i].totalBalance != 0) {
+          item.totalBalance = item.frozenBalance + item.balance;
+          
           let cybValue = await this.$callmsg(
             this.cybexjs.assetValue,
-            a[i].asset_type,
-            a[i].totalBalance,
+            item.asset_type,
+            item.totalBalance,
             "CYB"
           );
           let legalValue = await this.$callmsg(
             this.cybexjs.assetValue,
-            a[i].asset_type,
-            a[i].totalBalance,
+            item.asset_type,
+            item.totalBalance,
             legalId
           );
-
-          // if (a[i].asset_type == '1.3.22') {
-          //   console.log('1.3.22')
-          //   console.log(cybValue)
-          //   console.log(legalValue)
-          // }
 
           if (cybValue != -1) {
             totalCyb = totalCyb + cybValue;
@@ -417,15 +377,10 @@ export default {
             totalLegal = totalLegal + legalValue;
           }
 
-          this.$set(a[i], "cybValue", cybValue);
-          this.$set(a[i], "legalValue", legalValue);
-          // a[i].cybValue = cybValue
-          // a[i].legalValue = legalValue
+          this.$set(this.assets[i], "cybValue", cybValue);
+          this.$set(this.assets[i], "legalValue", legalValue);
         })
-      );
-
-      // console.log('totalCyb', totalCyb)
-      // console.log('totalLegal', totalLegal)
+      )
       this.setTotal({ balance: totalCyb, value: totalLegal });
     },
     createAsset() {

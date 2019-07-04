@@ -307,6 +307,9 @@ export default {
       let min;
       if (maxVal >= 3) {
         min = maxVal - 4 + 1;
+      // for PCX 临时挖矿设置
+      } else if (maxVal == 1) {
+        (maxVal = 1), (min = 0);
       } else {
         (maxVal = 2), (min = 0);
       }

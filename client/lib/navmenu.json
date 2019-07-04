@@ -1,0 +1,55 @@
+{
+  "internal": {
+    "contest": {
+      "enable": false,
+      "url": "/contest",
+      "text": {
+        "en": "Contest",
+        "zh-cn": "交易大赛专区"
+      }
+    },
+    "dot": {
+      "enable": true,
+      "url": "/dot",
+      "text": {
+        "en": "Order To Mine",
+        "zh-cn": "挂单挖矿"
+      },
+      "rulesUrlEn": "https://support.cybex.io/hc/en-us/articles/360000312502",
+      "rulesUrlZhCn": "https://support.cybex.io/hc/zh-cn/articles/360000312482--CYBEX%E4%BA%8E6%E6%9C%8824%E6%97%A5%E4%B8%8A%E7%BA%BF%E6%8C%82%E5%8D%95%E5%8D%B3%E6%8C%96CYB%E7%A6%8F%E5%88%A9%E6%B4%BB%E5%8A%A8-"
+    }
+  },
+  "external": {
+    "enable": true,
+    "text": {
+      "en": "Hot Activities",
+      "zh-cn": "热门活动"
+    },
+    "items": {
+      "eto": {
+        "enable": true,
+        "url": "https://olddex.cybex.io/eto",
+        "text": {
+          "en": "ETO Subscription",
+          "zh-cn": "ETO申购"
+        }
+      },
+      "eto-project": {
+        "enable": false,
+        "url": "https://olddex.cybex.io/eto/projects",
+        "text": {
+          "en": "ETO",
+          "zh-cn": "ETO"
+        }
+      },
+      "lockdrop": {
+        "enable": true,
+        "url": "https://olddex.cybex.io/lockdrop",
+        "text": {
+          "en": "Lockdrop",
+          "zh-cn": "锁仓空投"
+        }
+      }
+    }
+  }
+}

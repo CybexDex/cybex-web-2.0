@@ -9,6 +9,7 @@ export default {
     // 'wss://korea-01.cybex.io/',
     // 'wss://singapore-01.cybex.io/'
   ],
+  newgateway: 'http://35.220.160.53:8182',
   appconfig: {
     server: "http://47.107.136.146:8081", //"http://39.105.55.115:8081", //'https://api.cybex.live',//
     appserver: 'http://47.91.242.71:3039',

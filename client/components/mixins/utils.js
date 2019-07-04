@@ -1,4 +1,5 @@
-import { some, get } from 'lodash';
+// import pair from "~/lib/pair_config.js";
+import { some, get, isNumber, isString } from 'lodash';
 import moment from "moment";
 import { mapGetters } from 'vuex';
 import config from '~/lib/config/config.js';

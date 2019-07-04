@@ -7,6 +7,7 @@ export default ({ app }) => {
         var _privateLog = console.log;
         // Redefine console.log method with a custom function
         console.log = function (message) {
+            // _privateLog.apply(console, arguments);
             if (window.islog == true){
               _privateLog.apply(console, arguments);
             }else{

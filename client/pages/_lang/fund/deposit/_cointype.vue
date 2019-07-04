@@ -3,46 +3,52 @@
     <!-- memo -->
     <v-flex xs12 v-if="needShowMemo">
       <h3 class="mb-5">{{ `${coinname} ${$t('sub_title.deposit_addr')}` }}</h3>
-      <div class="address">
-        <cybex-text-field
-          class="input-text"
-          v-model="address"
-          readonly
-          :copy-icon="'ic-copy'"
-          :copy-icon-cb="onCopied"
-          middle
-        />
-      </div>
-      <h3 class="mt-4 mb-2">{{ $t('sub_title.verify_code') }}</h3>
-      <div class="eos-notice">
-        <div>{{ $t('info.eos_notice', {coinname}) }}</div>
-      </div>
-      <div class="address">
-        <cybex-text-field
-          middle
-          :value="memo"
-          :copy-icon="'ic-copy'"
-          :copy-icon-cb="onCopied"
-          class="input-text"
-          readonly
-        />
-      </div>
+      <template v-if="!islocked">
+        <div class="address">
+          <cybex-text-field
+            class="input-text"
+            v-model="address"
+            readonly
+            :copy-icon="'ic-copy'"
+            :copy-icon-cb="onCopied"
+            middle
+          />
+        </div>
+        <h3 class="mt-4 mb-2">{{ $t('sub_title.verify_code') }}</h3>
+        <div class="eos-notice">
+          <div>{{ $t('info.eos_notice', {coinname}) }}</div>
+        </div>
+        <div class="address">
+          <cybex-text-field
+            middle
+            :value="memo"
+            :copy-icon="'ic-copy'"
+            :copy-icon-cb="onCopied"
+            class="input-text"
+            readonly
+          />
+        </div>
+      </template>
+      <div v-else class="text-center unlock-tip"><strong>{{ $t('info.unlock_to_deposit') }}</strong></div>
     </v-flex>
     <!-- no memo -->
     <v-flex xs12 v-else>
       <h3>{{ `${coinname} ${$t('sub_title.deposit_addr')}` }}</h3>
-      <div class="address text-center" v-if="depoInfo && depoInfo.enable">
-        <canvas id="qrcode" width="310" height="310"/>
-        <cybex-text-field
-          middle
-          :copy-icon="'ic-copy not-narrow'"
-          :copy-icon-cb="onCopied"
-          class="input-text"
-          v-model="address"
-          readonly
-        />
+      <div class="address text-center" v-if="assetInfo && assetInfo.depositSwitch">
+        <template v-if="!islocked">
+          <canvas id="qrcode" width="310" height="310"/>
+          <cybex-text-field
+            middle
+            :copy-icon="'ic-copy not-narrow'"
+            :copy-icon-cb="onCopied"
+            class="input-text"
+            v-model="address"
+            readonly
+          />
+        </template>
+        <div v-else class="text-center unlock-tip"><strong>{{ $t('info.unlock_to_deposit') }}</strong></div>
       </div>
-      <p class="forbid-info" v-else>{{ depoInfo ? depoInfo[`${localeShort}Msg`] : '' }}</p>
+      <p class="forbid-info" v-else>{{ assetInfo ? assetInfo[`${localeShort}Msg`] : '' }}</p>
     </v-flex>
   </div>
 </template>
@@ -69,8 +75,7 @@ export default {
     return {
       address: "",
       message: "",
-      memo: "",
-      depoInfos: []
+      memo: ""
     };
   },
   components: {
@@ -80,99 +85,77 @@ export default {
     ...mapGetters({
       username: "auth/username",
       coinsInvert: "user/coinsInvert",
-      localeShort: "i18n/shortcut"
+      localeShort: "i18n/shortcut",
+      assetConfig: 'user/assetConfigBySymbol',
+      islocked: "auth/islocked"
     }),
     needShowMemo() {
-      return (this.depoInfo || {}).tag
+      return this.assetInfo.useMemo
     },
-    depoInfo() {
-      if (!this.coinsInvert || !this.cointype) return;
-      const r = this.depoInfos.find(e => {
-        return e.id === this.coinsInvert[this.cointype];
-      });
-      return r
+    assetInfo() {
+      return this.assetConfig[this.cointype] || {}
     },
     coinname () {
-      return this.$options.filters.shorten(this.cointype)
+      return this.assetInfo.name
     }
   },
   methods: {
     async refreshAddress(cointype) {
-      const type = this.$options.filters.shorten(cointype || this.cointype)
-      if (type === "EOS") {
-        await this.depositEOS();
-      } else {
-        const res = await this.$callmsg(
-          this.cybexjs.get_deposit,
-          type,
-          this.username
-        );
-        console.log('res', res);
-        if (res && res.data.getDepositAddress) {
-          const addr = res.data.getDepositAddress.address;
-          if ((this.depoInfo || {}).tag) {
-            const [address, memo] = addr.replace("]", "").split("[");
-            this.address = address;
-            this.memo = memo;
-          } else {
-            this.address = addr;
-            const canvasElem = document.getElementById("qrcode");
-            if (canvasElem) {
-              QRCode.toCanvas(
-                canvasElem,
-                this.address,
-                {
-                  margin: 1,
-                  width: 310
-                },
-                function(error) {
-                  if (error) console.error(error);
-                }
-              );
-            }
+      // try {
+        const coinname = cointype ? (this.assetConfig[cointype] || {}).name : this.coinname
+        const address = await this.cybexjs.gateway.user_address(this.username, coinname)
+        if (this.needShowMemo) {
+          const [ addr, memo ] = address.replace("]", "").split("[")
+          this.address = addr
+          this.memo = memo
+        } else {
+          this.address = address
+          const canvasElem = document.getElementById("qrcode")
+          if (canvasElem) {
+            QRCode.toCanvas(
+              canvasElem,
+              address,
+              {
+                margin: 1,
+                width: 310
+              },
+              function(error) {
+                if (error) console.error(error)
+              }
+            )
           }
         }
-      }
-    },
-    async depositEOS() {
-      let s = await this.$callmsg(this.cybexjs.get_deposit_eos, this.username);
-      if (s.data.getDepositAddress) {
-        const [account, memo] = s.data.getDepositAddress.address
-          .replace("]", "")
-          .split("[");
-        this.address = account;
-        this.memo = memo;
-      } else {
-        // console.error(s);
-      }
+      // } catch (e) { console.log(e) }
     },
     onCopied(item) {
       clipboard.writeText(item);
       this.$message({
         message: this.$t("message.copied")
       });
-    },
-    async checkEnable() {
-      try {
-        this.depoInfos = await this.$callmsg(this.cybexjs.deposit_list);
-        console.log('this.depoInfos', this.depoInfos);
-      } catch (e) {}
     }
   },
   watch: {
     async username(val) {
       if (!val) return;
-      await this.checkEnable();
-      await this.refreshAddress();
+      if (!this.islocked) {
+        await this.refreshAddress();
+      }
     },
     $route: async function(route) {
-      await this.checkEnable();
-      await this.refreshAddress(route.params.cointype);
+      if (!this.islocked) {
+        await this.refreshAddress(route.params.cointype);
+      }
+    },
+    async islocked (newval) {
+      if (!newval) {
+        await this.refreshAddress();
+      }
     }
   },
   async mounted() {
-    await this.checkEnable();
-    await this.refreshAddress();
+    if (!this.islocked) {
+      await this.refreshAddress();
+    }
   }
 };
 </script>
@@ -195,6 +178,10 @@ export default {
 
   .deposit {
     padding: 7px 32px;
+
+    .unlock-tip {
+      padding: 100px 20px;
+    }
 
     h3 {
       font-size: 14px;

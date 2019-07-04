@@ -1,62 +1,45 @@
 import Vue from 'vue'
 import Vue2Filters from 'vue2-filters'
 import moment from 'moment'
-import { floor, ceil, round } from 'lodash';
+import { floor, ceil, round, isNumber } from 'lodash';
 import config from '~/lib/config/config.js';
-import Bignumber from 'bignumber.js';
 
 Vue.use(Vue2Filters)
 
-// TEST. || JADE.
-const coinPreg = new RegExp(`^${config.appconfig.gatewayUser.asset_prefix}`);
-// ARENA.
-const gamecoinPreg = new RegExp(`^${config.game_prefix}`);
 
+const coinPreg = new RegExp(`^${config.appconfig.gatewayUser.asset_prefix}`);
+const gamecoinPreg = new RegExp(`^${config.game_prefix}`);
 const filters = {
-  /**
-   * 显示指定格式日期
-   * @param {Date | String | Number} d 日期
-   * @param {String} f format字符串 
-   */
   date: (d, f) => {
     const local = moment.utc(d).toDate();
     return moment(local).format(f);
   },
-  /**
-   * 根据币id显示币名(去前缀的)
-   * @param {String} id 币id
-   * @param {Object} coinMap 包含所有币信息的对象
-   */
   coinName: (id, coinMap) => {
     return coinMap && coinMap[id] ? coinMap[id].replace(coinPreg, '') : id;
   },
   /**
-   * 对大数值进行精简显示
-   * 百万级小数点精度不得超过2
-   * 千级小数点精度不得超过4
-   * 
-   * > 百万 xx m
-   * > 千 xx k
-   * 
-   * @param {*} value 精简的数值
-   * @param {*} precision 小数点精度
+   * TODO: 
+   * @param {*} value 
+   * @param {*} precision 
    */
   shortenVolume(value, precision) {
-    let v = new Bignumber(value);
-    let mNum = 10000 * 100;
-    let tNum = 1000;
-    precision = parseInt(precision) || 2;
-    let result = 0;
-    if (v.isGreaterThanOrEqualTo(mNum)) {
-      precision = precision > 2 ? 2 : precision;
-      result = v.dividedBy(mNum).toFormat(precision, {decimalSeparator: '.', suffix: 'm'});
-    } else if (v.isGreaterThanOrEqualTo(tNum)) {
-      precision = precision > 4 ? 4 : precision;
-      result = v.dividedBy(tNum).toFormat(precision, {decimalSeparator: '.', suffix: 'k'});
-    } else {
-      result = v.toFixed(precision);
+    value = parseFloat(value)
+    precision = precision || 2
+    let result = 0
+    if (isNumber(value)) {
+      if (value > 100 * 10000) {
+        const num = parseFloat(value / 100 / 10000)
+        precision = precision > 2 ? 2 : precision;
+        result = `${[num.toLocaleString().split('.').shift(), num.toFixed(precision).split('.').pop()].join('.')}m`
+      } else if (value > 1000) {
+        const num = parseFloat(value / 1000)
+        precision = precision > 4 ? 4 : precision;
+        result = `${[num.toLocaleString().split('.').shift(), num.toFixed(precision).split('.').pop()].join('.')}k`
+      } else {
+        result = [value.toLocaleString().split('.').shift(), value.toFixed(precision).split('.').pop()].join('.')
+      }
     }
-    return result;
+    return result
   },
   /**
    * 限制价格显示字节长度
@@ -144,25 +127,13 @@ const filters = {
       return symbol + parseFloat(val).toFixed(digitsLow)
     }
   },
-  /**
-   * 隐藏币种前缀
-   * @param {*} symbol 
-   */
   shorten (symbol) {
     return (symbol || '').replace(coinPreg, '')
   },
-  /**
-   * 隐藏交易大赛币种前缀
-   * @param {*} symbol 
-   */
   shortenContest (symbol, deal) {
     if (!deal) return symbol;
     return (symbol || '').replace(gamecoinPreg, '')
   },
-  /**
-   * 截取币名首字母
-   * @param {*} symbol 
-   */
   firstLetterCoin (symbol) {
     return (symbol || '').substr(0, 1);
   }

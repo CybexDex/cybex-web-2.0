@@ -184,6 +184,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      navMenus: "navMenus",
       locale: "i18n/locale",
       isConnect: "exchange/connect",
       coinMap: "user/coins",
@@ -233,21 +234,9 @@ export default {
     }
   },
   async mounted() {
-    if (this.$route.params.pairs) {
+    if (this.$route.params.pairs && this.navMenus) {
       // 交易大赛是否允许开启
-      let isGameActive = false;
-      await this.$eventHandle(async () => {
-        return await this.cybexjs.appconfig_settings();
-      })
-        .then(res => {
-          isGameActive = res.contestEnabled;
-        })
-        .catch(e => {
-          isGameActive = false;
-        })
-        .finally(() => {
-          this.$store.commit("exchange/SET_IS_GAME_ACTIVE", isGameActive);
-        });
+      let isGameActive = this.navMenus ? this.navMenus.internal.contest.enable : false;
       if (!isGameActive) {
         this.$nuxt.error({ statusCode: 404, message: "" });
       }

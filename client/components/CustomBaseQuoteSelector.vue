@@ -1,4 +1,3 @@
-<!-- 用户自定义交易对选择下拉菜单 -->
 <template>
   <div>
     <v-flex d-flex grow v-if="size == 'middle'"><div class="input-label">{{ $t('custom.quote-label') }}</div></v-flex>

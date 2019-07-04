@@ -1,6 +1,6 @@
 <template>
   <v-layout row wrap class="transfer-form-wrapper">
-    <template v-if="withInfo && withInfo.enable">
+    <template v-if="assetInfo.withdrawSwitch">
       <v-form ref="form">
         <v-flex xs12 class="form-field">
           <cybex-text-field
@@ -86,13 +86,13 @@
             <span class="fee-label">{{ $t('form_label.gateway_fee') }}</span>
             <span
               class="fee-amount"
-            >{{ gatewayfee.amount | roundDigits(precision) }} {{ gatewayfee.asset_id | shorten }}</span>
+            >{{ gatewayfee.amount | roundDigits(precision) }} {{ gatewayfee.asset_id | coinName(coinMap) | shorten }}</span>
           </p>
           <p>
             <span class="fee-label large">{{ $t('form_label.receive_amount') }}&nbsp;</span>
             <span
               class="fee-amount large"
-            >{{ realAmount | roundDigits(precision) }} {{ gatewayfee.asset_id | shorten }}</span>
+            >{{ realAmount | roundDigits(precision) }} {{ gatewayfee.asset_id | coinName(coinMap) | shorten }}</span>
           </p>
         </v-flex>
         <v-flex xs12 class="pt-3">
@@ -140,7 +140,7 @@
               <span class="left-label">{{ $t('form_label.gateway_fee') }}</span>
               <span
                 class="confirm-num"
-              >&nbsp;{{ gatewayfee.amount | roundDigits(precision) }} {{ gatewayfee.asset_id | shorten }}</span>
+              >&nbsp;{{ assetInfo.withdrawFee | roundDigits(precision) }} {{ gatewayfee.asset_id | coinName(coinMap) | shorten }}</span>
             </v-flex>
             <v-flex xs12 class="receive-amount mt-3">
               <span class="left-label">{{ $t('form_label.receive_amount') }}</span>
@@ -155,7 +155,7 @@
         </v-form>
       </v-dialog>
     </template>
-    <p class="forbid-info" v-else>{{ withInfo ? withInfo[`${localeShort}Msg`] : '' }}</p>
+    <p class="forbid-info" v-else>{{ assetInfo ? assetInfo[`${localeShort}Msg`] : '' }}</p>
   </v-layout>
 </template>
 
@@ -193,7 +193,7 @@ export default {
       gatewayfee: {},
       withdrawAmount: 0,
       balance: 0,
-      minAmount: 0,
+      // minAmount: 0,
       addrs: [],
       addressChecked: false,
       readyToSend: false,
@@ -204,8 +204,7 @@ export default {
       memoChecked: false,
       precision: 0,
       cybexPrecision: 0,
-      isMemoValid: false,
-      withInfos: []
+      isMemoValid: false
     };
   },
   computed: {
@@ -215,7 +214,8 @@ export default {
       coinsInvert: "user/coinsInvert",
       islocked: "auth/islocked",
       showUnlock: "showUnlock",
-      localeShort: "i18n/shortcut"
+      localeShort: "i18n/shortcut",
+      assetConfig: 'user/assetConfigBySymbol'
     }),
     canWithdraw() {
       return (
@@ -227,22 +227,23 @@ export default {
         (!this.memo || this.memoChecked)
       );
     },
+    minAmount() {
+      return parseFloat(this.assetInfo.minWithdraw)
+    },
     isAmountValid() {
       return this.amount >= this.minAmount && this.amount <= this.balance;
     },
     needShowMemo() {
-      return (this.withInfo || {}).tag
+      return this.assetInfo.useMemo
     },
     finalAddress() {
       return this.needShowMemo ? `${this.address}[${this.memo}]` : this.address;
     },
-    withInfo() {
-      return this.withInfos.find(e => {
-        return e.id === this.coinsInvert[this.cointype];
-      });
+    assetInfo() {
+      return this.assetConfig[this.cointype] || {}
     },
     coinname () {
-      return this.$options.filters.shorten(this.cointype)
+      return this.assetInfo.name
     }
   },
   methods: {
@@ -291,31 +292,32 @@ export default {
         if (/^\d+\.$/g.test(valstr)) {
           this.amount = newval;
         } else {
-          this.amount = formatted;
-          this.amountChecked = true;
+          this.amount = formatted
+          this.amountChecked = true
           if (value < this.minAmount) {
-            this.realAmount = 0;
+            this.realAmount = 0
             this.amountErrMsg = this.$t("validation.too_low_amount", {
               cointype: this.coinname,
               minAmount: this.minAmount
-            });
+            })
           } else if (value > this.balance) {
             this.realAmount = 0;
-            this.amountErrMsg = this.$t("validation.too_high_amount");
+            this.amountErrMsg = this.$t("validation.too_high_amount")
           } else {
-            await this.calFee(this.amount, this.cointype);
+            await this.calFee(this.amount, this.cointype)
           }
         }
       }
     },
     async calFee(amount, cointype) {
-      try {
+      // try {
         const result = await this.$callmsg(
           this.cybexjs.calAmountAndFee,
           this.username,
           amount,
           this.coinsInvert[cointype],
-          this.finalAddress
+          this.finalAddress,
+          this.assetInfo.withdrawPrefix
         );
         if (result) {
           this.gatewayfee = result.gatewayfee;
@@ -328,9 +330,9 @@ export default {
           this.realAmount = result.real_amount > 0 ? result.real_amount : 0;
           this.withdrawAmount = result.withdraw_amount;
         }
-      } catch (e) {
-        // console.log('some error when calfee', e)
-      }
+      // } catch (e) {
+      //   // console.log('some error when calfee', e)
+      // }
     },
     async validateMemo() {
       this.memo = this.memo.trim();
@@ -364,14 +366,13 @@ export default {
       }
     },
     async validateAddress() {
-      this.addressChecked = false;
-      this.isAddressValid = await this.$callmsg(
-        this.cybexjs.checkAddress,
-        this.cointype,
-        this.username,
-        this.address
-      );
-      this.addressChecked = true;
+      this.addressChecked = false
+      try {
+        this.isAddressValid = await this.cybexjs.gateway.verify_addrss(this.assetInfo.name, this.address)
+      } catch (e) {
+        this.isAddressValid = false
+      }
+      this.addressChecked = true
     },
     async sendTx() {
       // coin, coin_symbol, amount, addr ,fee_asset_id
@@ -385,7 +386,9 @@ export default {
           this.gatewayfee.asset_id,
           this.withdrawAmount,
           this.finalAddress,
-          this.cybexfee.asset_id
+          this.cybexfee.asset_id,
+          this.assetInfo.gatewayAccount,
+          this.assetInfo.withdrawPrefix
         );
         // console.log('==== send tx result: ', ret, this.finalAddress)
         if (ret) {
@@ -397,13 +400,13 @@ export default {
             this.address = "";
             this.resetFee();
             await this.fetchBalance(this.cointype);
-            this.inSendTx = false;
+            // this.inSendTx = false;
           });
         }
       } catch (e) {
         // console.log(e)
-        this.inSendTx = false;
       }
+      this.inSendTx = false;
     },
     async fetchNotice() {},
     checkAmount(value) {
@@ -416,18 +419,13 @@ export default {
       this.amount = this.balance.toString();
       await this.validateFee();
     },
-    async fetchMinAmount(cointype) {
-      try {
-        const res = await this.$callmsg(this.cybexjs.withdraw_info, cointype);
-        const info = res.data.withdrawInfo;
-        this.minAmount = info.minValue;
-      } catch (e) {}
-    },
-    async checkEnable() {
-      try {
-        this.withInfos = await this.$callmsg(this.cybexjs.withdraw_list);
-      } catch (e) {}
-    }
+    // async fetchMinAmount(cointype) {
+    //   try {
+    //     const res = await this.$callmsg(this.cybexjs.withdraw_info, cointype);
+    //     const info = res.data.withdrawInfo;
+    //     this.minAmount = info.minValue;
+    //   } catch (e) {}
+    // },
   },
   watch: {
     async username(val) {
@@ -435,9 +433,9 @@ export default {
       this.address = '';
       // this.showConfirm = false;
       this.resetFee();
-      await this.checkEnable();
+      // await this.checkEnable();
       this.fetchBalance(this.cointype);
-      await this.fetchMinAmount(this.cointype);
+      // await this.fetchMinAmount(this.cointype);
       await this.calFee(0, this.cointype);
     },
     showUnlock(newval, oldval) {
@@ -448,20 +446,20 @@ export default {
         this.readyToSend = false;
       }
     },
-    $route: async function(route) {
-      await this.checkEnable();
+    '$route': async function(route) {
+      // await this.checkEnable();
       this.fetchBalance(route.params.cointype);
-      await this.fetchMinAmount(route.params.cointype);
+      // await this.fetchMinAmount(route.params.cointype);
       await this.calFee(0, route.params.cointype);
     }
   },
   async mounted() {
-    await this.checkEnable();
-    this.fetchBalance(this.cointype);
-    await this.fetchMinAmount(this.cointype);
-    await this.calFee(0, this.cointype);
+    // await this.checkEnable();
+    this.fetchBalance(this.cointype)
+    // await this.fetchMinAmount(this.cointype);
+    await this.calFee(0, this.cointype)
   }
-};
+} 
 </script>
 
 <style lang="stylus">

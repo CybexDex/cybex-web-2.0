@@ -51,28 +51,37 @@
           :class="getLinkClass('/exchange')"
         >{{ $t('nav.exchange') }}</nuxt-link>
       </div>
-      <div
-        v-if="false"
-        class="exchange-tab"
-        :class="{'fill-height': $route.path.indexOf('/contest') > -1}"
+      <!-- 读取配置生成对应菜单 -->
+      <div v-for="(menu, menuIdx) of navMenus.internal" :key="menuIdx" class="fill-height d-flex align-center">
+        <div v-if="menu.enable" class="exchange-tab" :class="{'fill-height': $route.path.indexOf(menu.url) > -1}">
+          <nuxt-link
+            :to="$i18n.path(menu.url)"
+            :class="getLinkClass(menu.url)"
+          >{{ locale == 'en' ? menu.text['en'] : menu.text['zh-cn'] }}</nuxt-link>
+        </div>
+      </div>
+      <v-menu
+        v-if="navMenus.external && navMenus.external.enable"
+        content-class="nav-menu"
+        class="ml-3 pl-0 exchange-tab nav-menu-wrapper column activity"
+        :transition="'fade-transition'"
+        offset-y
+        auto
+        open-on-hover
       >
-        <nuxt-link
-          :to="$i18n.path(defaultContestPath)"
-          :class="getLinkClass('/contest')"
-        >{{ $t('nav.contest') }}</nuxt-link>
-      </div>
-      <div class="exchange-tab">
-        <a class="exchange-link btn-jump" target="_blank" href="https://olddex.cybex.io/eto" v-text="$t('nav.eto')"/>
-      </div>
-      <div class="exchange-tab">
-        <a class="exchange-link btn-jump" target="_blank" href="https://olddex.cybex.io/eto/projects" v-text="$t('nav.eto-projects')"/>
-      </div>
-      <div class="exchange-tab" :class="{'fill-height': $route.path.indexOf('/dot') > -1}">
-        <nuxt-link
-          :to="$i18n.path('/dot')"
-          :class="getLinkClass('/dot')"
-        >{{ $t('nav.dot') }}</nuxt-link>
-      </div>
+        <div slot="activator" class="full-width btn-jump" dark>
+          {{ locale == 'en' ? navMenus.external.text['en'] : navMenus.external.text['zh-cn'] }}
+        </div>
+        <v-list class="asset-menu">
+          <v-list-tile v-for="(submenu, subIdx) of navMenus.external.items" :key="subIdx" :class="{hidden: !submenu.enable}">
+            <v-list-tile-title v-if="submenu.enable">
+              <a target="_blank" :href="submenu.url">
+                {{ locale == 'en' ? submenu.text['en'] : submenu.text['zh-cn'] }}
+              </a>
+            </v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
       <v-spacer/>
       <!-- funds menu -->
       <v-menu
@@ -273,7 +282,7 @@ export default {
     LogoutDialog: () => import("~/components/LogoutDialog.vue"),
     UserPortrait: () => import("~/components/UserPortrait.vue"),
     SettingsDialog: () => import("~/components/AppSettingsDialog.vue"),
-    PermissionDialog: () => import("~/components/AppPermissionDialog.vue"),
+    PermissionDialog: () => import("~/components/AppPermissionDialog.vue")
   },
   props: {
     height: {
@@ -322,6 +331,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      navMenus: "navMenus",
       inited: "user/inited",
       connect: "exchange/connect",
       prefix: "exchange/prefix",
@@ -332,11 +342,11 @@ export default {
       userHasNotice: "auth/hasNotice",
       asset_is_custom: "exchange/asset_is_custom",
       is_contest: "exchange/is_contest",
-      isGameActive: "exchange/is_game_active",
       showMsg: "showMsg",
       message: "msgContent",
       msgType: "msgType",
       langs: "i18n/locales",
+      locale: "i18n/locale",
       msgDelay: "msgDelay",
       defaultAsset: "exchange/defaultAsset",
       volume24h: "exchange/volume24h",
@@ -407,11 +417,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      initBasics: "user/init"
-    }),
     getSettingItems() {
-      if (!this.username) { return []; }
+      if (!this.username) {
+        return [];
+      }
       let items = [
         {
           title: "nav.settings.general",
@@ -431,13 +440,13 @@ export default {
         items.push({
           title: "nav.settings.backup",
           path: `/settings/backup`
-        })
+        });
       }
       items.push({
         title: "nav.settings.permission",
         path: "",
         clickEvt: this.showPermissionDialog
-      })
+      });
       return items;
     },
     showSettingDialog() {
@@ -486,7 +495,8 @@ export default {
         }
       }
       const showExchangeBottom =
-        (path === "/exchange" || path === "/contest" || path === "/dot") && isActive;
+        (path === "/exchange" || path === "/contest" || path === "/dot") &&
+        isActive;
       return {
         "btn-jump": true,
         "active-link": isActive,
@@ -545,12 +555,6 @@ export default {
     }
   },
   async mounted() {
-    if (!this.connect) {
-      await this.cybexjs.start();
-    }
-    if (!this.inited) {
-      await this.initBasics();
-    }
     // 24小时总成交量
     await this.get24hVolumeByETH();
     // this.drawPortrait();
@@ -579,6 +583,10 @@ export default {
 
   &.icon {
     min-width: 56px;
+  }
+
+  &.activity {
+    // min-width: 108px;
   }
 
   .v-menu__activator {
@@ -630,11 +638,16 @@ export default {
       font-size: 12px;
       f-cybex-style('heavy');
       height: 32px;
-      padding: 0 12px;
+      padding: 0;
       color: rgba($main.white, 0.8);
-
+      > * {
+        padding: 0 10px;
+      }
       a {
         color: rgba($main.white, 0.8);
+        width: 100%;
+        height: 100%;
+        display: block;
       }
 
       &:hover {

@@ -6,7 +6,8 @@ export const state = () => ({
   showUnlock: false,
   showLogout: false,
   showVersion: false,
-  dwCoinType: null
+  dwCoinType: null,
+  navMenus: {"internal": {}, "external": {}} // 导航栏设置
 });
 
 export const getters = {
@@ -17,7 +18,8 @@ export const getters = {
   showLogout: state => state.showLogout,
   showVersion: state => state.showVersion,
   msgDelay: state => state.msgDelay,
-  dwCoinType: state => state.dwCoinType
+  dwCoinType: state => state.dwCoinType,
+  navMenus: state => state.navMenus
 };
 
 export const mutations = {
@@ -45,6 +47,9 @@ export const mutations = {
   },
   UPDATE_DW_COINTYPE: function(state, cointype) {
     state.dwCoinType = cointype;
+  },
+  SET_NAV_MENUS: (state, menus) => {
+    state.navMenus = Object.assign(state.navMenus, menus);
   }
 };
 

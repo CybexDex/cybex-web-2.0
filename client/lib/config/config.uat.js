@@ -4,6 +4,7 @@ export default {
   ],
   gaID:'UA-129900093-3',
   umengID: "1277677507",
+  newgateway: 'https://gateway2test.cybex.io',
   appconfig: {
     server: 'http://47.100.98.113:8081',// 'https://live.cybex.io', // "https://cybtestbrowser.nbltrust.com", //"http://39.105.55.115:8081", //'https://api.cybex.live',//
     appserver: 'http://47.100.98.113:3039',
@@ -18,7 +19,7 @@ export default {
       withdraw: "withdraw:CybexGateway"
     },
     gatewayUser: {
-      withdraw: "uat-gateway",
+      withdraw: "xiao01",
       asset_prefix: "JADE.",
       asset_default_no_prefix: ["CYB", "CYBG"]
     }

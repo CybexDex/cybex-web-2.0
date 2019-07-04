@@ -1,15 +1,15 @@
 var lineReader = require('readline').createInterface({
-  input: require('fs').createReadStream('decimal.csv')
+  input: require('fs').createReadStream('decimal-update-by-roger.csv')
 });
 
-// var countDigits = function(n){
-//   var count = 0;
-//   while (n * 10 <= 1) {
-//     n *= 10;
-//     ++count;
-//   }
-//   return count;
-// }
+var countDigits = function(n){
+  var count = 0;
+  while (n * 10 <= 1) {
+    n *= 10;
+    ++count;
+  }
+  return count;
+}
 var makeDigits = function(n) {
   let t = 1 / Math.pow(10, n);
   return parseFloat(t).toFixed(n);

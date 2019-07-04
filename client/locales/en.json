@@ -122,6 +122,8 @@
     "rebates": "Rebates",
     "eto": "ETO Subscription",
     "eto-projects": "ETO",
+    "hot": "Hot activities",
+    "lock": "Lockdrop",
     "dot": "Order To Mine"
   },
   "custom": {
@@ -370,7 +372,8 @@
     "ready_exist": "Already have an account?",
     "login_here": "Login here",
     "or": "or",
-    "permission_notice": "Do not give away your private key, once leaked, your funds will be in danger"
+    "permission_notice": "Do not give away your private key, once leaked, your funds will be in danger",
+    "unlock_to_deposit": "Unlock to get deposit address"
   },
   "button": {
     "create_wallet_account": "Create Cloud Wallet Account",
@@ -539,16 +542,25 @@
     "name": "Account Name",
     "current_points": "Current Points",
     "dot_notice": {
-      "line_1": "Event Time: June 5, 2019 00:00 – June 7, 2019 23:59 (UTC+8)",
-      "line_2": "Trading Pairs for Mining: CYB/USDT Only",
-      "line_3": "Mining Amount: 28.8 DOT/Per Day",
-      "line_4": "Specific Rules:",
-      "line_5": "1. Cybex defines that one minute is a cycle of the ranking, with 1,440 (60*24) cycles per day, and a mining bonus for every one minute is 0.02 DOT.",
-      "line_6": "2. Based on the 4-decimal aggregate volume, the top 20 orders of Buy and Sell of CYB/USDT trading pairs will be snapshot in random time within each cycle.",
-      "line_7": "3. All orders, with the amount no less than 100 CYB in the snapshots, are calculated to rank the “points” of the user. The calculation formula of “points” is: order amount of the user (CYB) * Weight.",
-      "line_8": "4. Based on “points”, the top 20 users will receive the bonus from mining DOT according to the proportion.",
-      "line_9": "DOT Bonus = the points of the user by creating orders/total points of Buy and Sell orders based on the snapshot time * 0.02 DOT",
-      "line_10": "5. Mining bonus will be released every cycle (that is, it will be released every five minutes).",
+      "title": "Create Order to Mine CYB, Share 400,000 CYB!",
+      "line_1": "The Specific Rules:",
+      "line_1_1": "Event Time: 13:00 on June 24, 2019 - 13:00 on June 26, 2019（UTC+8）",
+      "line_1_2": "Trading Pairs: CYB/USDT",
+      "line_1_3": "Tokens Rewarded in the Event: CYB with one-year lock-up period",
+      "line_1_4": "Bonus Releasing Time: Next Day",
+      "line_1_5": "Rewarded Amount: 400,000 CYB in two days",
+      "line_1_6": "Share 200,000 CYB every day; Share 138.89 CYB every minute",
+      "line_2": "Requirements:",
+      "line_2_1": "Top 20 orders in Buy and Sell (Refer to the picture).",
+      "line_2_2": "The amount of orders is no less than 100 CYB (including 100 CYB).",
+      "line_2_3": "Orders need to be in the snapshots.",
+      "line_3": "Bonus Calculation:",
+      "line_3_0": "Bonus = (orders amount x weight)/(total points of top 20 in Buy + total points of top 20 in Sell) x 138.89",
+      "line_3_1": "Points: orders amount x Weight",
+      "line_3_2": "If the amount of orders is less than 100, the point is 0.",
+      "line_3_3": "Time for snapshots: snapshot every minute in random time",
+      "line_3_4": "Order decimal: based on 4-decimal aggregate volume",
+      "line_4": "Orders Weight:",
       "header_1": "Order",
       "header_2": "Weight",
       "td_buy_1": "Buy 1",
@@ -558,7 +570,17 @@
       "td_sell_1": "Sell 1",
       "td_sell_2": "Sell 2 - Sell 5",
       "td_sell_3": "Sell 6 - Sell 10",
-      "td_sell_4": "Sell 11 - Sell 20"
+      "td_sell_4": "Sell 11 - Sell 20",
+      "line_5": "Extra Bonus:",
+      "line_5_0": "Bonus based on Points Ranking ",
+      "line_5_1": "No.1: 1888 CYB",
+      "line_5_2": "No.2: 888 CYB",
+      "line_5_3": "No.3: 666 CYB",
+      "line_5_4": "No.4 - No. 10: 188 CYB",
+      "line_6": "Note:",
+      "line_6_1": "1. Time for the total points: 13:00 on June 24 - 13:00 on June 26. Ranking is based on snapshots",
+      "line_6_2": "2. Bonus Releasing Time: June 28, 2019",
+      "line_6_3": "3. Extra bonus: CYB with one-year lock-up period"
     }
   }
 }

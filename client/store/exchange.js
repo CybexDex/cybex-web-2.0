@@ -39,7 +39,6 @@ export const state = () => ({
 export const getters = {
   base: state => state.baseCurrency,
   game_prefix: state => state.gamePrefix,
-  is_game_active: state => state.isGameActive,
   asset_is_custom: state => state.assetIsCustom,
   is_contest: state => state.isContest,
   base_is_custom: state => state.baseIsCustom,
@@ -121,9 +120,6 @@ export const mutations = {
   },
   SET_IS_CONTEST(state, val) {
     state.isContest = val;
-  },
-  SET_IS_GAME_ACTIVE(state, val) {
-    state.isGameActive = val
   }
 }
 
@@ -189,7 +185,10 @@ export const actions = {
     
     if (!base_id || !quote_id) {
       console.error('no base found');
-      dispatch('redirectToDefault');
+      rawlog('base_id', base_id);
+      rawlog('quote_id', quote_id);
+      await dispatch('redirectToDefault');
+      return;
     }
     baseInfo['id'] = base_id;
     baseInfo['symbol'] = rb ? rb.symbol : ''; 

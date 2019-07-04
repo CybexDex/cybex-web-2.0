@@ -9,6 +9,7 @@ export default {
     'wss://europe01.cybex.io/',
     'wss://usa-01.cybex.io/'
   ],
+  newgateway: 'http://35.220.160.53:8182',
   appconfig: {
     server: "https://cybtestbrowser.nbltrust.com", //'https://api.cybex.live',//
     appserver: 'https://app.cybex.io',

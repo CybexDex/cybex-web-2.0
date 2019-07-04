@@ -13,22 +13,23 @@
       <template slot="items" slot-scope="props">
         <tr>
           <td class="text-xs-left">
-            <span>{{ props.item.asset | shorten }}</span>
+            <span>{{ props.item.asset }}</span>
           </td>
-          <td class="text-xs-left">{{ $t(`button.${props.item.fundType.toLowerCase()}`) }}</td>
+          <td class="text-xs-left">{{ $t(`button.${props.item.type.toLowerCase()}`) }}</td>
           <td
             class="text-xs-right"
-          >{{ (props.item.amount / Math.pow(10, props.item.precision)) | floorDigits(6) }}</td>
-          <td class="text-xs-left">{{ props.item.address }}</td>
+          >{{ parseFloat(props.item.totalAmount) | floorDigits(props.item.precision || 6) }}</td>
+          <td class="text-xs-left"><div class="addr-row" :title="props.item.outAddr">{{ props.item.outAddr }}</div></td>
           <td class="text-xs-left">
-            <span style="text-transform: capitalize;">{{ $t(`info.${props.item.state}`) }}</span>
+            <span style="text-transform: capitalize;">{{ $t(`info.${props.item.status.toLowerCase()}`) }}</span>
           </td>
-          <td class="text-xs-right">{{ props.item.updateAt | date('DD/MM/YYYY HH:mm:ss') }}</td>
+          <td class="text-xs-right">{{ props.item.updatedAt | date('DD/MM/YYYY HH:mm:ss') }}</td>
           <td class="text-xs-right">
+            <!-- use etherscan when no explorer found -->
             <a
               class="explorer-link"
-              v-if="props.item.link"
-              @click="open(props.item.link)"
+              v-if="(explorers[props.item.asset] || explorers['ETH']) && props.item.outHash"
+              @click="open(`${(explorers[props.item.asset] || explorers['ETH']).explorer}${props.item.outHash}`)"
             >{{ $t('button.view_detail') }}</a>
           </td>
         </tr>
@@ -49,7 +50,8 @@
 <script>
 import moment from "moment";
 import config from "~/lib/config/config.js";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import { keyBy, isEmpty } from 'lodash'
 
 export default {
   props: {
@@ -114,12 +116,14 @@ export default {
           align: "right",
           sortable: false
         }
-      ]
+      ],
+      explorers: {}
     };
   },
   computed: {
     ...mapGetters({
-      username: "auth/username"
+      username: "auth/username",
+      assetConfig: 'user/assetConfigByName',
     }),
     itemDatas() {
       return this.history || [];
@@ -156,59 +160,38 @@ export default {
       await this.initLoad();
     }
   },
-  // filters: {
-  //   state (item) {
-  //     const lastDetail = item.details ? item.details[item.details.length - 1] : null
-  //     return lastDetail ? lastDetail.state : item.state
-  //   }
-  // },
   methods: {
     async initLoad() {
       if (!this.islocked) {
-        this.offset = 0;
         this.page = 1;
         this.total = 0;
+        this.offset = 0;
         await this.loadHistory();
       }
-    },
-    getExplorerLink(data) {
-      const last = data.details[data.details.length - 1];
-      return last.hash
-        ? (data.projectInfo.txExplorer || "").replace("#{txid}", last.hash)
-        : "";
     },
     async loadHistory() {
       this.history = null;
       this.isLoading = true;
       this.$eventHandle(
         async () => {
-          const data = await this.cybexjs.gatewayRecord(
-            (this.page - 1) * this.size,
-            this.size,
-            (this.fundtype || "").toUpperCase(),
-            this.asset
-          );
-          if (data) {
+          const data = await this.cybexjs.gateway.get_user_records(this.username, this.fundtype, this.asset, this.size, this.offset)
+          if (data && data.records) {
             // TO DO 静态缓存precision
             await Promise.all(
               data.records.map(async i => {
-                const data = await this.cybexjs.queryAsset(i.asset);
-                i.precision = data.precision;
-                const link = this.getExplorerLink(i);
-                i.link = link;
+                const cfgItem = this.assetConfig[i.asset]
+                i.precision = cfgItem ? parseInt(cfgItem.precision) : 6
               })
             );
           }
-          // rawlog('==== loadHistory: ', data) 
           return data;
         },
         [],
         { user: true }
       ).then(data => {
         this.history = data.records;
-        this.offset = data.offset;
-        this.page = Math.floor(data.offset / this.size) + 1;
         this.total = data.total;
+        // this.page = Math.floor((this.total - data.total) / this.size) + 1;
       }).catch(e => {
         console.error(e);
         this.history = null;
@@ -216,16 +199,35 @@ export default {
         this.isLoading = false;
       });
     },
-    async onPageChanged() {
-      this.offset = (this.page - 1) * this.size;
+    async onPageChanged(value) {
+      this.offset = Math.min((value - 1) * this.size, this.total)
       await this.loadHistory();
     },
     open(url) {
       window.open(url);
-    }
+    },
+    async fetchExplorer() {
+      const ret = await this.$callmsg(this.cybexjs.fetch_blockexplorer)
+      this.explorers = keyBy(ret, 'asset')
+    },
+    ...mapActions({
+      loadAssetConfig: 'user/loadAssetConfig'
+    })
   },
   async mounted() {
+    if (!this.assetConfig || isEmpty(this.assetConfig)) {
+      await this.loadAssetConfig()
+    }
     await this.initLoad();
+    await this.fetchExplorer()
   }
 };
 </script>
+
+<style lang="stylus" scoped>
+.addr-row {
+  width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

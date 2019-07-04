@@ -126,7 +126,7 @@ export const actions = {
   // 用户登录 分本地钱包和云钱包模式
   // 对cybex用户 login = unlock + 设置本地缓存
   login(
-    { commit },
+    { commit, state, rootState },
     { username, password, mode, walletFile, backupFlag = false }
   ) {
     return this._vm.$eventHandle(
@@ -226,7 +226,7 @@ export const actions = {
   // register
   // 注册
   async register(
-    { dispatch },
+    { dispatch, commit },
     { mode, username, password, codeId, code }
   ) {
     console.log(
@@ -432,10 +432,6 @@ export const actions = {
   setUnlockPeriod({}, { username, val }) {
     return UserStorageService.setUnlockPeriod(username, val);
   },
-  /**
-   * 获取当前用户名对应用户id
-   * @param {*} param0 
-   */
   async getUserId({state, commit}) {
     if (state.info) {
       const userInfo = await this._vm.cybexjs.get_user(state.info.getCurrentUser());

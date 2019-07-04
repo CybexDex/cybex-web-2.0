@@ -11,6 +11,7 @@ export default {
   ],
   gaID:"UA-129900093-2",
   umengID: "1277677507",
+  newgateway: 'http://35.220.160.53:8182',
   appconfig: {
     server: "http://120.79.34.14:8081", //"http://39.105.55.115:8081", //'https://api.cybex.live',//
     appserver: 'http://47.91.242.71:3039',

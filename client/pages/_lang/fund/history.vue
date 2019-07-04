@@ -75,7 +75,8 @@ export default {
   computed: {
     ...mapGetters({
       islocked: "auth/islocked",
-      coinMapInvert: "user/coinsInvert"
+      coinMapInvert: "user/coinsInvert",
+      username: 'auth/username'
     })
   },
   methods: {
@@ -83,11 +84,12 @@ export default {
       this.$toggleLock();
     },
     async loadUsedAssets() {
-      try {
-        const validData = await this.$callmsg(this.cybexjs.gatewayAsset);
-        this.usedAssets = map(validData.records, i => i.groupInfo.asset);
+      // try {
+        // const validData = await this.$callmsg(this.cybexjs.gatewayAsset);
+        const group = await this.cybexjs.gateway.get_records_desc(this.username)
+        this.usedAssets = map(group, i => i.asset)
         this.usedAssets.unshift(null);
-      } catch (e) {}
+      // } catch (e) {}
       const element = document.querySelector(".v-select-list.v-card");
       if (element) {
         new PerfectScrollbar(element, {
@@ -174,6 +176,7 @@ export default {
   }
 
   .selected-item {
+    width: 100%;
     height: 24px;
     line-height: 24px;
     border-radius: 4px;

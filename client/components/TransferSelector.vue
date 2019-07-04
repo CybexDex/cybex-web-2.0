@@ -16,24 +16,24 @@
           <div class="selection" @click="onOpenSelect" slot="activator">
             <template v-if="selected">
               <div
-                v-if="!isRemoteNotice && customAssetsMap[selected.id]"
+                v-if="isTransfer && customAssetsMap[selected.cybid]"
                 class="ic-asset-icon-bg asset-icon-bg mr-0"
-              >{{ selected.id | coinName(coinMap) | shorten | shortenContest | firstLetterCoin }}</div>
+              >{{ selected.cybid | coinName(coinMap) | shorten | shortenContest | firstLetterCoin }}</div>
               <v-img
                 v-else
                 class="img-box"
-                :src="iconMap[selected.id]"
+                :src="iconMap[selected.cybid]"
                 max-width="20"
                 width="20"
                 height="20"
               />
               <span class="ml-2 name-column text-left">
-                <asset-pairs :asset-id="selected.id" :shorten-game="false"/>
+                <asset-pairs :asset-id="selected.cybid" :shorten-game="false"/>
               </span>
               <span
-                v-if="fundtype !== 'transfer' && selected && selected.projectName"
+                v-if="fundtype !== 'transfer' && (selected || {}).projectname"
                 class="ml-2 full-name text-right"
-              >({{ selected.projectName }})</span>
+              >({{ selected.projectname }})</span>
               <v-spacer/>
               <v-icon>{{ showSelection ? 'ic-arrow_up' : 'ic-arrow_drop_down' }}</v-icon>
             </template>
@@ -57,30 +57,30 @@
                 </v-list-tile>
                 <template v-if="itemList.length > 0">
                   <v-list-tile
-                    v-for="(item, index) in itemList"
-                    :key="index"
+                    v-for="item in itemList"
+                    :key="item.cybid"
                     @click="onSelected(item)"
                     ripple
                   >
                     <div class="select-wrap">
                       <div
-                        v-if="!isRemoteNotice && customAssetsMap[item.id]"
+                        v-if="isTransfer && customAssetsMap[item.cybid]"
                         class="ic-asset-icon-bg asset-icon-bg mr-0"
-                      >{{ item.id | coinName(coinMap) | shorten | shortenContest | firstLetterCoin }}</div>
+                      >{{ customAssetsMap[item.cybid] | shorten | shortenContest | firstLetterCoin }}</div>
                       <v-img
                         v-else
                         max-width="20"
                         width="20px"
                         height="20px"
-                        :src="iconMap[item.id]"
+                        :src="iconMap[item.cybid]"
                       />
                       <span class="ml-2 name-column text-left">
-                        <asset-pairs :asset-id="item.id"/>
+                        <asset-pairs :asset-id="item.cybid"/>
                       </span>
                       <span
-                        v-if="fundtype !== 'transfer' && selected && selected.projectName"
+                        v-if="fundtype !== 'transfer' && selected && selected.projectname"
                         class="ml-2 full-name text-right"
-                      >({{ item.projectName }})</span>
+                      >({{ item.projectname }})</span>
                     </div>
                   </v-list-tile>
                 </template>
@@ -91,12 +91,12 @@
             </perfect-scrollbar>
           </div>
         </v-menu>
-        <div v-if="isRemoteNotice" class="shortcut">
+        <div v-if="!isTransfer" class="shortcut">
           <template v-for="(coin, index) in coins">
             <v-chip
               ref="shortcut"
               class="select_coin"
-              v-if="fullList.findIndex(i=>i.enable && (coinMap[i.id].indexOf(coin) > -1)) > -1"
+              v-if="fullList.findIndex(i=>i[`${fundtype}Switch`] && ((coinMap[i.cybid] || '').indexOf(coin) > -1)) > -1"
               :key="index"
               :selected="selectedCoin(index)"
               label
@@ -110,7 +110,7 @@
           <slot/>
         </div>
         <div class="notice-wrap">
-          <template v-if="isRemoteNotice">
+          <template v-if="!isTransfer">
             <div class="img-link mt-3 mb-2">
               <a v-if="icon.link" @click="open(icon.link)">
                 <v-img :src="icon.img_url" width="48" max-width="48" :height="48"/>
@@ -133,10 +133,10 @@
           </template>
           <div class="notice-head mt-3">
             <v-icon size="18" class="mr-2">ic-info-orange</v-icon>
-            <span v-if="isRemoteNotice">{{ notice.title }}</span>
+            <span v-if="!isTransfer">{{ notice.title }}</span>
             <span v-else>{{ $t('sub_title.important_notice') }}</span>
           </div>
-          <div class="mt-4 mb-4" v-if="isRemoteNotice">
+          <div class="mt-4 mb-4" v-if="!isTransfer">
             <p class="add mb-0" v-for="(item, index) in notice.adds" :key="index">{{ item.text }}</p>
             <span
               class="add mt-3"
@@ -148,7 +148,7 @@
       </v-flex>
       <v-flex xs12 class="mt-5">
         <h3 class="mb-4">{{ $t(`sub_title.record_${fundtype}`) }}</h3>
-        <template v-if="isRemoteNotice">
+        <template v-if="!isTransfer">
           <div v-if="islocked" class="desc-wrap">
             <cybex-btn
               small
@@ -156,7 +156,7 @@
               @click="onUnlockClicked"
             >{{ $t('button.unlock_view') }}</cybex-btn>
           </div>
-          <history-list :fundtype="fundtype" :asset="coinMapInvert[cointype]" v-else/>
+          <history-list :fundtype="fundtype" :asset="assetInfo.name" v-else/>
         </template>
         <template v-else>
           <transfer-history-list/>
@@ -169,7 +169,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import utils from "~/components/mixins/utils";
-import { filter, map, cloneDeep } from "lodash";
+import { filter, map, cloneDeep, values, assign, sortBy } from "lodash";
 
 export default {
   mixins: [utils],
@@ -217,65 +217,47 @@ export default {
       userAssets: "user/userAssets",
       assets: "user/assets",
       game_prefix: "exchange/game_prefix",
-      username: "auth/username"
+      username: "auth/username",
+      assetConfig: 'user/assetConfigBySymbol',
+      customAssetsMap: 'user/customAssets'
     }),
-    customAssetsMap() {
-      const assetMap = {};
-      const users = cloneDeep(this.userAssets);
-      const all = map(this.assets, i => i.asset_id);
-      users.forEach(i => {
-        if (all.indexOf(i.asset_type) === -1) {
-          assetMap[i.asset_type] = true;
-        }
-      });
-      return assetMap;
-    },
     transfer() {
-      return map(filter(this.userAssets, j => parseFloat(j.balance) > 0 && !(this.coinMap[j.asset_id] || '').startsWith(this.game_prefix)), i => {
+      return map(filter(this.userAssets, j => parseFloat(j.balance) > 0 && !(this.coinMap[j.asset_id] || this.customAssetsMap[j.asset_id] || '').startsWith(this.game_prefix)), i => {
         return {
-          id: i.asset_type,
-          enable: true
+          cybid: i.asset_type,
+          isCustom: !!this.customAssetsMap[i.asset_type],
+          cybname: this.coinMap[i.asset_type] || this.customAssetsMap[i.asset_type]
         };
-      });
+      })
     },
     fullList() {
       if (this.fundtype === "transfer") {
         return this.transfer;
       } else {
-        return (
-          (this.fundtype === "withdraw" ? this.withdraw : this.deposit) || []
-        );
+        return values(this.assetConfig).map(o => {
+          return assign(o, { enable: this.fundtype === 'withdraw' ? o.withdrawSwitch : o.depositSwitch })
+        })
       }
     },
     itemList() {
-      return filter(this.fullList, item => {
-        return (
-          (!this.querystr ||
-            this.coinMap[item.id].indexOf(this.querystr.toUpperCase()) >= 0) &&
-          item.enable &&
-          (!this.selected || this.selected.id !== item.id)
-        );
-      });
+      return filter(this.fullList, item => 
+        (!this.querystr || (this.coinMap[item.cybid] || '').indexOf(this.querystr.toUpperCase()) >= 0)
+          && (this.fundtype === "transfer" || item[`${this.fundtype}Switch`])
+          && (!this.selected || this.selected.cybid !== item.cybid)
+      );
     },
     iconMap() {
       return this.icons || [];
     },
-    isRemoteNotice() {
-      return this.fundtype !== "transfer";
+    isTransfer() {
+      return this.fundtype === "transfer";
+    },
+    assetInfo() {
+      return this.assetConfig[this.cointype]
     }
   },
   watch: {
-    withdraw(list) {
-      if (this.fundtype === "withdraw") {
-        this.ensureSelected(list, this.cointype);
-      }
-    },
-    deposit(list) {
-      if (this.fundtype === "deposit") {
-        this.ensureSelected(list, this.cointype);
-      }
-    },
-    transfer(list) {
+    fullList(list) {
       if (this.fundtype === "transfer") {
         this.ensureSelected(list, this.cointype);
       }
@@ -290,20 +272,18 @@ export default {
       }
     },
     cointype(value) {
-      this.checkEnabled();
-      this.loadOpInfo(value);
+      if (this.fundtype !== "transfer") {
+        this.loadOpInfo(value)
+      }
+      this.ensureSelected(this.fullList, value)
     },
     async username(){
       this.selected = null;
-    },
-    userAssets() {
-      this.initTransfer();
     }
   },
   methods: {
     ...mapActions({
-      load_icons: "user/load_icons",
-      loadDWList: "user/loadDWList"
+      load_icons: "user/load_icons"
     }),
     selectedCoin(idx) {
       return (
@@ -318,30 +298,23 @@ export default {
     },
     ensureSelected(list, cointype) {
       if (list && !this.selected) {
-        this.selected = list.find(item => this.coinMap[item.id] === cointype);
+        this.selected = list.find(item => (this.customAssetsMap[item.cybid] || this.coinMap[item.cybid]) === cointype);
       }
     },
     async loadOpInfo(cointype) {
-      const info = this.fundtype === "withdraw" ? this.withdraw : this.deposit;
-      this.ensureSelected(info, cointype);
-      const handler = this.cybexjs[`${this.fundtype}_infos`];
-      if (handler) {
-        try {
-          const param = this.coinMapInvert[this.cointype];
-          const datas = await this.$callmsg(handler, param);
-          this.icon = datas[`icon_${this.shortcut}`];
-          this.msg = datas[`msg_${this.shortcut}`];
-          this.notice = datas[`notice_${this.shortcut}`];
-        } catch (e) {}
-      }
+      const handler = this.fundtype === 'withdraw' ? this.cybexjs.withdraw_infos : this.cybexjs.deposit_infos
+      try {
+        const param = this.coinMapInvert[this.cointype];
+        const datas = await this.$callmsg(handler, param);
+        this.icon = datas[`icon_${this.shortcut}`];
+        this.msg = datas[`msg_${this.shortcut}`];
+        this.notice = datas[`notice_${this.shortcut}`];
+      } catch (e) { console.log(e) }
     },
-    onSelected(val) {
-      console.log("###### onSelected", val);
+    async onSelected(val) {
       if (!val) return;
-      const coinname = typeof val === "string" ? val : this.coinMap[val.id];
-      this.selected = this[this.fundtype].find(
-        item => this.coinMap[item.id] === coinname
-      );
+      const coinname = typeof val === "string" ? val : val.cybname || this.coinMap[val.cybid] || this.customAssetsMap[val.cybid];
+      this.selected = this.assetConfig[coinname]
       this.$nextTick(() => {
         this.showSelection = false;
       });
@@ -349,44 +322,15 @@ export default {
     },
     onUnlockClicked() {
       this.$toggleLock();
-    },
-    checkEnabled() {
-      if (
-        this.fullList.findIndex(
-          i => i.enable && this.coinMap[i.id].indexOf(this.cointype) > -1
-        ) === -1
-      ) {
-        this.$i18n.jumpTo(`/fund/${this.fundtype}/${this.defaultAsset}`);
-      }
-    },
-    initTransfer() {
-      const assetId = this.coinMapInvert[this.cointype];
-      let asset = this.userAssets.find(i => i.asset_type === assetId);
-      if (!asset || parseFloat(asset.balance) === 0) {
-        asset = this.userAssets.find(i => i.balance > 0);
-        if (asset) {
-          const coinname = this.coinMap[asset.asset_type];
-          this.$router.replace(this.$i18n.path(`/fund/transfer/${coinname}`));
-        }
-      }
-      setTimeout(() => {
-        this.ensureSelected(this.transfer, this.cointype);
-      }, 350);
     }
   },
   async mounted() {
     window.jumpTo = this.$i18n.jumpTo;
-    if (this.fundtype === "transfer") {
-      if (this.userAssets) {
-        this.initTransfer();
-      }
-    } else {
-      await this.loadDWList({
-        operation: this.fundtype,
-        caller: this.$callmsg,
-        force: true
-      });
-      await this.loadOpInfo(this.cointype);
+    if (this.fundtype !== "transfer") {
+      await this.loadOpInfo(this.cointype)
+    }
+    if (this.fullList && this.cointype) {
+      this.ensureSelected(this.fullList, this.cointype)
     }
   }
 };

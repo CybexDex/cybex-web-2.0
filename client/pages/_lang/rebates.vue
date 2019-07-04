@@ -46,7 +46,29 @@ export default {
       isLoading: false,
       showEmpty: false,
       coinsList: [],
-      dataList: []
+      dataList: [],
+      testData: [
+        {
+          asset_id: "1.3.1148",
+          should_transfer: 0,
+          transferred: 5800
+        },
+        {
+          asset_id: "1.3.1149",
+          should_transfer: 0,
+          transferred: 14632
+        },
+        {
+          asset_id: "1.3.1150",
+          should_transfer: 29042709,
+          transferred: 57234907
+        },
+        {
+          asset_id: "1.3.1151",
+          should_transfer: 29042709,
+          transferred: 233307
+        }
+      ]
     };
   },
   computed: {
@@ -56,6 +78,7 @@ export default {
       icons: "user/icons"
     }),
     iconsMap() {
+      console.log("icons", this.icons);
       return this.icons || [];
     }
   },

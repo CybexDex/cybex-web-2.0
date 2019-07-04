@@ -22,7 +22,7 @@ export default class UserStorageService {
     this._localKey = localKey ? localKey : "walletname";
     this.setupStorage();
   }
-  // 获取用户锁时间
+
   static getUnlockPeriod(username) {
     if (!username) {
       return null;
@@ -37,7 +37,6 @@ export default class UserStorageService {
     }
     return val;
   }
-  // 设置用户锁时间
   static setUnlockPeriod(username, val) {
     if (!username) {
       return;
@@ -75,7 +74,6 @@ export default class UserStorageService {
   setCloudWalletName(walletName) {
     this._storage.setItem(this._cloudKey, walletName);
   }
-  // 获取云钱包名字
   getCloudWalletName() {
     return this._storage.getItem(this._cloudKey);
   }

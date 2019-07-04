@@ -65,7 +65,26 @@ export default {
    * Router configuration
    */
   router: {
-    middleware: ['i18n', 'nouser'],
+    extendRoutes(routes, resolve) {
+      routes.push({
+        name: 'test',
+        path: '/:lang/test',
+        component: resolve(__dirname, 'client/lib/test.vue')
+      })
+      if (process.env.NODE_ENV !== 'production') {
+        routes.push({
+          name: 'qa-test',
+          path: '/:lang/qa-test',
+          component: resolve(__dirname, 'client/lib/qa-test.vue')
+        })
+        routes.push({
+          name: 'wallet-test',
+          path: '/:lang/wallet-test',
+          component: resolve(__dirname, 'client/lib/wallet-test.vue')
+        })
+      }
+    },
+    middleware: ['i18n', 'nouser', 'init-store'],
     scrollBehavior: function (to, from, savedPosition) {
       return { x: 0, y: 0 }
     }
@@ -106,6 +125,7 @@ export default {
       src: '~plugins/perfect-scroll',
       ssr: false
     },
+    // { src: '~plugins/vuex-persist', ssr: false }
   ],
   /**
    * static css load

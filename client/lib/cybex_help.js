@@ -9,6 +9,8 @@ import cached from './cache.js'
 import rte from './rte.js'
 import status from './status.js'
 import config from './config/config.js'
+import {Gateway} from "./gateway.js";
+
 import {
   promisify,
   random_id,
@@ -76,6 +78,8 @@ class Cybex {
     this.store = null
     this.keytimer = null
     this.name2idDic = null
+    this.gateway = new Gateway(config.newgateway, this)
+    // this.gateway = new Gateway("https://gateway2test.cybex.io", this)
     this.NODELIST = NODELIST
     this.start = promisify(_.partial(this.start_cb, this))
   }
@@ -1236,7 +1240,6 @@ class Cybex {
     }
     let pub = this.user.options.memo_key
     const keypair = _.find(this.userkeys, pair => pair.pubKey === pub)
-    console.log('$$$$$ findMemokey: ', keypair, pub, this.userkeys)
     return keypair
   }
   async gatewaylogin(seconds, refresh = false) {
@@ -1267,6 +1270,12 @@ class Cybex {
     let keyname = "signer:" + this.user.name
     const result = await cached(keyname, s1.bind(this), refresh, seconds)
     return result
+  }
+  signStr(strToSign){
+    let buffer = Buffer.from(strToSign, 'utf8')
+    let key = this.findActivekey()
+    let signedHex = Signature.signBuffer(buffer, key.privKey).toHex()
+    return signedHex
   }
   async gatewayAsset(fundtype, asset_id) {
     if (!this.userkeys) {
@@ -2259,39 +2268,21 @@ class Cybex {
     if (coin.indexOf(appconfig.gatewayUser.asset_prefix) == 0) {
       coin = coin.slice(appconfig.gatewayUser.asset_prefix.length)
     }
+    let self = this
     async function s() {
-      let hr = await axios.post(`${appconfig.gateway}/gateway`, {
-        "operationName": "WithdrawInfo",
-        "variables": {
-          "type": coin
-        },
-        "query": "query WithdrawInfo($type: String!) {\n  withdrawInfo(type: $type) {\n    fee\n    minValue\n    precision\n    asset\n    type\n    gatewayAccount\n    __typename\n  }\n}\n"
-      });
-      if (hr.status == 200) {
-        if (!hr.data.data) {
-          let error_string = JSON.stringify(hr.data.errors)
-          log("error_string", error_string)
-          if (error_string.includes("No availiable fee")) {
-            throw new Error(err_pre + "S.config.withdraw_info")
-          }
-        }
-        if (hr.data.data && hr.data.data.withdrawInfo) {
-          return hr.data
-        }
-        throw new Error(err_pre + "S.gateway.withdraw_info")
-      }
-      throw new Error(err_pre + "S.gateway.withdraw_info")
+      let h = await self.gateway.get_asset(coin)
+      return h
     }
     const result = await cached('withdraw_info' + coin, s, false, 600)
     return result
   }
-  async withdraw(coin, coin_symbol, amount, addr, fee_asset_id = '1.3.0') {
+  async withdraw(coin, coin_symbol, amount, addr, fee_asset_id = '1.3.0', gatewayAccount, withdrawPrefix) {
     coin = this.gateway_type(coin)
     console.log("withraw", coin, coin_symbol, amount, addr, fee_asset_id)
-    let memo = `${appconfig.memos.withdraw}:${coin}:${addr}`
+    let memo = `${withdrawPrefix}:${coin}:${addr}`
     try {
       let s = await this.transfer({
-        to: appconfig.gatewayUser.withdraw,
+        to: gatewayAccount,
         amount: amount,
         asset: coin_symbol,
         memo: memo,
@@ -2614,6 +2605,9 @@ class Cybex {
       throw (e)
     }
   }
+  async fetch_blockexplorer() {
+    return await this.appserver_json('blockexplorer.json')
+  }
   async withdraw_infos(coin) {
     let c = await this.queryAsset(coin)
     let s
@@ -2638,17 +2632,6 @@ class Cybex {
     } catch (e) {
       throw (e)
     }
-  }
-  async deposit_list() {
-    let s = await this.appserver_json("deposit.json")
-    this.store.commit('user/SET_DEPOSIT', s)
-    return s
-  }
-  async withdraw_list() {
-    let s = await this.appserver_json("withdraw.json")
-    log('withdraw_list', s)
-    this.store.commit('user/SET_WITHDRAW', s)
-    return s
   }
   async fees() {
     let self = this
@@ -2728,13 +2711,16 @@ class Cybex {
   }
   // 计算提现手续费
   // return gatewayfee,cybexfee,withdraw_amount,real_amount
-  async calAmountAndFee(uname, amount, coin_id, addr) {
+  async calAmountAndFee(uname, amount, coin_id, addr,withdrawPrefix) {
     // 网关手续费
     let coin = await this.queryAsset(coin_id)
     let gatewayname = coin.gatewayname
     let g = await this.withdraw_info(gatewayname)
     // log(g)
-    let gatewayfee = _.get(g, "data.withdrawInfo")
+    let gatewayfee = {
+      asset:coin.id,
+      fee: parseFloat(g.withdrawFee)
+    }
     let dic = {}
     if (!gatewayfee) {
       throw new Error("can get gateway fee")
@@ -2746,7 +2732,7 @@ class Cybex {
     // 上链手续费
     let memo
     if (addr) {
-      memo = `${appconfig.memos.withdraw}:${gatewayname}:${addr}`
+      memo = `${withdrawPrefix}:${gatewayname}:${addr}`
     }
     log(memo)
     let cybfee = await this.fake_tr_memo_fee(memo, "1.3.0")
