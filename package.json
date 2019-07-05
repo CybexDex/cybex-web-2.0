@@ -15,6 +15,7 @@
     "generate:prod": "USE_TESTNET=0 nuxt generate",
     "generate:prod:no_mdp": "USE_MDP=0 USE_TESTNET=0 nuxt generate",
     "generate:uat": "USE_ENV=uat nuxt generate",
+    "generate:docker": "USE_ENV=docker nuxt generate",
     "generate:prod:mdp2": "USE_ENV=mdp2 USE_TESTNET=0 nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint"
