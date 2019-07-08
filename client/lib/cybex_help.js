@@ -23,6 +23,16 @@ let log = function (...args) {
   // console.log("cybexhelp:", ...args)
 }
 
+function getHost(currentHost) {
+  if (currentHost.includes('127.0.0.1') || currentHost.includes('localhost')) {
+    let { hostname } = window.location
+    let host = currentHost.replace(/127.0.0.1|localhost/, hostname)
+    return host
+  } else {
+    return currentHost
+  }
+}
+
 function sumByPre(arr, name) {
   let a = new BigNumber(0)
   for (let x of arr) {
@@ -78,7 +88,7 @@ class Cybex {
     this.store = null
     this.keytimer = null
     this.name2idDic = null
-    this.gateway = new Gateway(config.newgateway, this)
+    this.gateway = new Gateway(getHost(config.newgateway), this)
     // this.gateway = new Gateway("https://gateway2test.cybex.io", this)
     this.NODELIST = NODELIST
     this.start = promisify(_.partial(this.start_cb, this))
@@ -666,7 +676,8 @@ class Cybex {
     return result
   }
   async loadConfigedAssets() {
-    let url = `${appconfig.appserver}/json/assets.json`
+    let host = getHost(appconfig.appserver)
+    let url = `${host}/json/assets.json`
     try {
       let hr = await axios.get(url);
       if (hr.status == 200) {
@@ -970,7 +981,8 @@ class Cybex {
   }
   async asset_icon(asset_id) {
     let name = asset_id.split(".").join("_")
-    let url = `${appconfig.appserver}/icons/${name}_grey.png`
+    let host = getHost(appconfig.appserver)
+    let url = `${host}/icons/${name}_grey.png`
     return url
   }
   async order_history(base, quote, limit = 50) {
@@ -1381,7 +1393,8 @@ class Cybex {
   // TODO 法币价格 目前只有人民币价格
   async legal_currency() {
     async function s() {
-      let url = `${appconfig.appserver}/price`
+      let host = getHost(appconfig.appserver)
+      let url = `${host}/price`
       try {
         let hr = await axios.get(url);
         if (hr.status == 200) {
@@ -1407,7 +1420,8 @@ class Cybex {
   }
   async appserver_json(jsonpath) {
     async function s() {
-      let url = `${appconfig.appserver}/json/${jsonpath}`
+      let host = getHost(appconfig.appserver)
+      let url = `${host}/json/${jsonpath}`
       try {
         let hr = await axios.get(url);
         if (hr.status == 200) {
@@ -1431,7 +1445,8 @@ class Cybex {
   }
   async base_market(base_id) {
     async function s() {
-      let url = `${appconfig.appserver}/market_price?base=${base_id}`
+      let host = getHost(appconfig.appserver)
+      let url = `${host}/market_price?base=${base_id}`
       try {
         let hr = await axios.get(url);
         if (hr.status == 200 && hr.data.code == 0) {
@@ -1447,7 +1462,8 @@ class Cybex {
   }
   async loadbase_config(base_id) {
     async function s() {
-      let url = `${appconfig.appserver}/market_list?base=${base_id}`
+      let host = getHost(appconfig.appserver)
+      let url = `${host}/market_list?base=${base_id}`
       try {
         let hr = await axios.get(url);
         if (hr.status == 200) {
