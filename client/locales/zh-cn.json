@@ -470,7 +470,12 @@
     "expiration": "到期时间",
     "transfer_in": "收款方",
     "transfer_out": "付款方",
-    "memo": "Memo"
+    "memo": "Memo",
+    "from": "发起人",
+    "to": "接收人",
+    "end_lock": "锁定期到期时间",
+    "hash": "哈希值",
+    "hash_type": "哈希算法"
   },
   "tab_label": {
     "subscribed": "已收藏",
@@ -484,7 +489,8 @@
     "otherslist": "自定义交易区",
     "gamelist": "交易大赛交易区",
     "backup": "备份文件",
-    "phrase": "助记词"
+    "phrase": "助记词",
+    "hashlockup": "哈希锁定期资产"
   },
   "label": {
     "pagination": "第 {start} 至 {end} 条 共 {total} 条"

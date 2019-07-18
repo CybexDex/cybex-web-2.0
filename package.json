@@ -1,6 +1,6 @@
 {
   "name": "cybex-ex-2",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "Cybex2.0 Ex Frontend",
   "private": true,
   "scripts": {
@@ -15,7 +15,6 @@
     "generate:prod": "USE_TESTNET=0 nuxt generate",
     "generate:prod:no_mdp": "USE_MDP=0 USE_TESTNET=0 nuxt generate",
     "generate:uat": "USE_ENV=uat nuxt generate",
-    "generate:docker": "USE_ENV=docker nuxt generate",
     "generate:prod:mdp2": "USE_ENV=mdp2 USE_TESTNET=0 nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint"
@@ -32,7 +31,7 @@
     "file-saver": "^2.0.1",
     "jdenticon": "^2.1.0",
     "js-cache": "^1.0.3",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "lzma": "2.1.6",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",

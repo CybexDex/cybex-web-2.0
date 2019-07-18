@@ -92,6 +92,9 @@
           <v-tab-item>
             <lockup-list/>
           </v-tab-item>
+          <v-tab-item>
+            <hash-lockup-asset-list />
+          </v-tab-item>
         </v-tabs>
       </v-flex>
     </v-layout>
@@ -109,7 +112,8 @@ export default {
     NoticeTip: () => import("~/components/NoticeTip.vue"),
     AssetList: () => import("~/components/AssetList.vue"),
     LockupList: () => import("~/components/LockupList.vue"),
-    UserAssetList: () => import("~/components/UserAssetList.vue")
+    UserAssetList: () => import("~/components/UserAssetList.vue"),
+    HashLockupAssetList: () => import("~/components/HashLockupAssetList.vue")
   },
   head() {
     return {
@@ -132,6 +136,10 @@ export default {
         {
           label: this.$t("tab_label.lockup"),
           path: "lockup"
+        },
+        {
+          label: this.$t("tab_label.hashlockup"),
+          path: "hashlockup"
         }
       ]
     };

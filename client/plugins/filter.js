@@ -3,6 +3,7 @@ import Vue2Filters from 'vue2-filters'
 import moment from 'moment'
 import { floor, ceil, round, isNumber } from 'lodash';
 import config from '~/lib/config/config.js';
+import BigNumber from 'bignumber.js';
 
 Vue.use(Vue2Filters)
 
@@ -106,10 +107,11 @@ const filters = {
    * @param {*} emptySymbol 
    */
   roundDigits(val, digit, emptyVal, emptySymbol) {
-    if (typeof emptyVal !== undefined && val === emptyVal)
+    if (typeof emptyVal !== undefined && val === emptyVal) {
       return typeof emptySymbol !== undefined ? emptySymbol : '-'
-    else
+    } else {
       return round(val, digit).toFixed(digit);
+    } 
   },
   /**
    * 法币精度显示
@@ -136,6 +138,20 @@ const filters = {
   },
   firstLetterCoin (symbol) {
     return (symbol || '').substr(0, 1);
+  },
+  /**
+   * 数值小于最小精度时的显示
+   * 如精度为1, 值为0.0001, 显示为 < 1
+   * @param {*} val 
+   * @param {*} digits 
+   */
+  avoidMinAmount(val, digits) {
+    let value = new BigNumber(val);
+    const minVal = new BigNumber(10).exponentiatedBy(0 - parseInt(digits));
+    if (value.isLessThan(minVal)) {
+      return '< ' + minVal.toString();
+    }
+    return val;
   }
 }
 

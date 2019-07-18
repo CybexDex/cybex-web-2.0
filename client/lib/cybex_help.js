@@ -2727,10 +2727,10 @@ class Cybex {
   }
   // 计算提现手续费
   // return gatewayfee,cybexfee,withdraw_amount,real_amount
-  async calAmountAndFee(uname, amount, coin_id, addr,withdrawPrefix) {
+  async calAmountAndFee(uname, amount, coin_id, addr,withdrawPrefix, gatewayname) {
     // 网关手续费
     let coin = await this.queryAsset(coin_id)
-    let gatewayname = coin.gatewayname
+    // let gatewayname = coin.gatewayname
     let g = await this.withdraw_info(gatewayname)
     // log(g)
     let gatewayfee = {
@@ -2844,6 +2844,15 @@ class Cybex {
     const balances = fullaccount.balances
     this.balances = balances
     return balances
+  }
+  async hashLockedAssets(user) {
+    const [account] = await this.rawdb('get_full_accounts', [user], false);
+    const fullaccount = account[1];
+    let lockupAsset = fullaccount.htlcs;
+    if (!lockupAsset) {
+      lockupAsset = [];
+    }
+    return lockupAsset;
   }
 }
 

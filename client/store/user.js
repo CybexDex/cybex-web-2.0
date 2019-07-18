@@ -187,7 +187,7 @@ export const actions = {
         a.balance = 0
         a.frozenBalance = 0
       }
-      const assetCfg = state.assetConfig.find(o => o.cyid === assetId ) || {}
+      const assetCfg = (state.assetConfig || []).find(o => o.cyid === assetId ) || {}
       newArr.push(merge(a, assetCfg))
     }
     commit('SET_ASSETS', newArr)

@@ -14,7 +14,7 @@
           />
         </div>
         <button class="header-info-btn" @click="handleDotInfo">{{ $t('dot.rule') }}</button>
-        <!-- DOT 弹窗说明 -->
+        <!-- 弹窗说明 -->
         <v-dialog
           v-model="showNoticeDialog"
           persistent
@@ -92,7 +92,8 @@
     <div class="account-info">
       <div class="account-info-tag">
         <div class="info-tag-title">{{ $t('dot.my_bonus') }}</div>
-        <div class="info-tag-num">{{ myBonus }} PCX</div>
+        <div class="info-tag-num" v-if="!myBonus">0</div>
+        <div class="info-tag-num" v-else>{{ myBonus }} {{ assetInfo.symbol | shorten }}</div>
       </div>
       <div class="account-info-tag">
         <div class="info-tag-title">{{ $t('dot.my_ranking') }}</div>
@@ -140,11 +141,13 @@ export default {
       myRanking: "--",
       myPoints: "--",
       dotList: [],
+      assetInfo: {},
       showNoticeDialog: false // 展示 DOT 弹窗
     };
   },
   computed: {
     ...mapGetters({
+      coins: "user/coins",
       navMenus: "navMenus",
       username: "auth/username", // 获取用户名
       userId: "auth/userId", // 获取账户id
@@ -175,12 +178,13 @@ export default {
       // console.debug("YYYYYYYYYY: ", this.username);
       let result = await this.cybexjs.getDotPointsRanking(this.username);
       // 获取账户信息
-      let my_bonus = result.mine;
+      let my_bonus = result.mine ? Number(result.mine): 0;
       let my_rank = result.position;
-      let my_score = result.score;
-      if (Number(my_bonus != 0)) {
-        // 换算成pcx精度
-        this.myBonus = parseFloat((my_bonus / Math.pow(10, 6)).toFixed(6));
+      let my_score = result.score ? Number(result.score) : 0;
+      if (my_bonus) {
+        // 换算成币种精度
+        this.assetInfo = await this.cybexjs.queryAsset(result.asset);
+        this.myBonus = parseFloat((my_bonus / Math.pow(10, this.assetInfo.precision)).toFixed(this.assetInfo.precision));
       } else {
         this.myBonus = my_bonus;
       }
@@ -189,7 +193,7 @@ export default {
       } else {
         this.myRanking = my_rank;
       }
-      if (Number(my_score) != 0) {
+      if (my_score) {
         this.myPoints = my_score.toFixed(2);
       } else {
         this.myPoints = my_score;

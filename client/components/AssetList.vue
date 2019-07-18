@@ -304,11 +304,11 @@ export default {
         const cfg = this.assetConfig[asset.asset_type] || {}
         asset.withdrawSwitch = cfg.withdrawSwitch
         if (!asset.withdrawSwitch) {
-          data.whyNotWithdraw = get(cfg, `info.withdraw.${this.localeShort}Msg`)
+          data.whyNotWithdraw = get(cfg, `info.withdraw`)
         }
         asset.depositSwitch = cfg.depositSwitch
         if (!asset.depositSwitch) {
-          data.whyNotDeposit = get(cfg, `info.deposit.${this.localeShort}Msg`)
+          data.whyNotDeposit = get(cfg, `info.deposit`)
         }
         // balance
         if (asset.balance != 0) {
@@ -336,7 +336,7 @@ export default {
       let legalId = this.locale === "zh" ? null : this.prefix + "USDT"
       const values = [];
       await Promise.all(
-        map(list, async (item, i) => {
+        map(this.assets, async (item, i) => {
           const frozen = await this.$callmsg(
             this.cybexjs.frozenBalances,
             this.username,
@@ -530,7 +530,7 @@ export default {
       margin-left: 8px;
     }
 
-    tr, td {
+    tr:not(.v-datatable__expand-row), td {
       height: 56px;
       line-height: 56px;
       box-shadow: inset 0 -2px 0 0 rgba(23, 29, 42, 1);

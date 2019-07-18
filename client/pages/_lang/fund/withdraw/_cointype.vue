@@ -317,7 +317,8 @@ export default {
           amount,
           this.coinsInvert[cointype],
           this.finalAddress,
-          this.assetInfo.withdrawPrefix
+          this.assetInfo.withdrawPrefix,
+          this.assetInfo.name
         );
         if (result) {
           this.gatewayfee = result.gatewayfee;
@@ -450,7 +451,9 @@ export default {
       // await this.checkEnable();
       this.fetchBalance(route.params.cointype);
       // await this.fetchMinAmount(route.params.cointype);
-      await this.calFee(0, route.params.cointype);
+    },
+    cointype: async function(cointype) {
+      await this.calFee(0, cointype);
     }
   },
   async mounted() {

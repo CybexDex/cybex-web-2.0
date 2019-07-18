@@ -470,7 +470,12 @@
     "expiration": "Expiration Time",
     "transfer_in": "In",
     "transfer_out": "From",
-    "memo": "Memo"
+    "memo": "Memo",
+    "from": "From",
+    "to": "To",
+    "end_lock": "End Time of Locking",
+    "hash": "Hash",
+    "hash_type": "Hash Type"
   },
   "tab_label": {
     "subscribed": "Favorite",
@@ -484,7 +489,8 @@
     "otherslist": "Others",
     "gamelist": "Contest",
     "backup": "Back Up",
-    "phrase": "Mnemonic Phrase"
+    "phrase": "Mnemonic Phrase",
+    "hashlockup": "Hash Lockup Assets"
   },
   "label": {
     "pagination": "{start}-{end} of {total}"

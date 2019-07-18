@@ -16,7 +16,7 @@
                 'c-buy': trade.tradetype == 'buy', 
                 'c-sell': trade.tradetype =='sell'}"
             >{{ trade.price | roundDigits(digitsPrice) | shortenPrice }}</span>
-            <span class="amount">{{ trade.quote | roundDigits(digitsAmount) }}</span>
+            <span class="amount">{{ trade.quote | roundDigits(digitsAmount) | avoidMinAmount(digitsAmount) }}</span>
             <span class="time c-white-30">{{ trade.time | date('HH:mm:ss') }}</span>
           </div>
         </perfect-scrollbar>
