@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@sentry/browser": "^4.3.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-polyfill": "^6.26.0",
     "bignumber.js": "^7.2.1",
     "clipboard-polyfill": "^2.4.1",
