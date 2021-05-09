@@ -31,7 +31,7 @@
     "file-saver": "^2.0.1",
     "jdenticon": "^2.1.0",
     "js-cache": "^1.0.3",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.21",
     "lzma": "2.1.6",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",
