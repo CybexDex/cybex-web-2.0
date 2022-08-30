@@ -34,7 +34,7 @@
     "lodash": "^4.17.14",
     "lzma": "2.1.6",
     "moment": "^2.22.2",
-    "moment-timezone": "^0.5.23",
+    "moment-timezone": "^0.5.35",
     "nuxt": "^2.2.0",
     "on-change": "^0.1.0",
     "qrcode": "^1.2.0",
